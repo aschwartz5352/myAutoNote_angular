@@ -1,0 +1,113 @@
+<section @loadPage id="note-header">
+  <section id="note-header-left">
+    <md-icon (click)="back()" mdTooltip="choose a different note">arrow_back</md-icon>
+
+    <h3 mdTooltip="click to change title" >{{notePath}}</h3>
+
+  </section>
+<md-icon id="save-icon" mdTooltip="save" (click)="save()">save</md-icon>
+</section>
+<!-- <section [@loadPage]="notePath" *ngIf="false"> -->
+<section [@loadPage]="notePath" *ngIf="dbNote">
+
+  <section id="work-wrapper" [@workScreen]="viewMode">
+
+
+    <md-grid-list [cols]="(viewMode == 'quick') ? 2: 1" rowHeight="fit">
+      <md-grid-tile  [@advancedEditorViewer]="viewMode" *ngIf="viewMode == 'quick'" >
+        <section class="grid-tile-wrapper">
+          <md-card id="editor-card">
+            <md-card-content class="editor-wrapper">
+              <!--   <quill-editor #editor (onContentChanged)="updateContent($event)" [(ngModel)]="value">
+              <div quill-editor-toolbar>
+                  <span class="ql-formats">
+                    <button class="ql-bold" mdTooltip="bold" ></button>
+                    <button class="ql-italic" mdTooltip="italic" ></button>
+                    <button class="ql-underline" mdTooltip="underline" ></button>
+
+                  </span>
+
+                </div>
+              </quill-editor> -->
+            </md-card-content>
+          </md-card>
+        </section>
+
+      </md-grid-tile>
+      <md-grid-tile id="viewer-tile">
+        <section  class="grid-tile-wrapper">
+          <md-card id="viewer-card ">
+            <md-card-content class="editor-wrapper">
+              <!-- <quill-editor #editor2 id="formatted-text" [ngModel]="formattedNotes" [readOnly]="viewMode!='advanced'" placeholder="your formatted notes will show up here">
+                <div quill-editor-toolbar>
+                  <span class="ql-formats" [@advancedEditorFunction]="viewMode" id="advanced-editor">
+
+                      <button class="ql-bold" mdTooltip="bold" ></button>
+                      <button class="ql-italic" mdTooltip="italic" ></button>
+                      <button class="ql-underline" mdTooltip="underline" ></button>
+
+                      <button class="ql-list" value="bullet" mdTooltip="bullet point" ></button>
+                      <button class="ql-list" value="ordered" mdTooltip="ordered list" ></button>
+
+                      <select class="ql-color" mdTooltip="font color" value="font color"></select>
+                      <select class="ql-background" mdTooltip="background color" value="highlight"></select>
+
+                      <select class="ql-header" mdTooltip="header"></select>
+                  </span>
+                  <span class="ql-formats" style="height=0px"></span>
+                  <md-icon mdTooltip="move to advanced mode" (click)="switchToAdvanced()">mode_edit</md-icon>
+
+                </div>
+
+              </quill-editor> -->
+              <!-- <section id="formatted-text" [innerHTML]="formattedNotes | sanitizeHtml">
+              </section> -->
+            </md-card-content>
+
+          </md-card>
+        </section>
+
+      </md-grid-tile>
+    </md-grid-list>
+
+
+
+
+
+  </section>
+</section>
+
+<!-- <section id="editor-wrapper">
+  <section id="editor-header">
+    <section id="editor-header-left">
+      <button (click)="format('bold', $event)">
+        <md-icon >format_bold</md-icon>
+      </button>
+      <button (click)="format('italic', $event)">
+        <md-icon >format_italic</md-icon>
+      </button>
+      <button (click)="format('underline', $event)">
+        <md-icon >format_underline</md-icon>
+      </button>
+    </section>
+    <section id="editor-header-right">
+      <md-icon mdTooltip="save" (click)="save()">save</md-icon>
+    </section>
+
+  </section>
+  <section #editorBox id="editor-box" contenteditable="true" [innerHTML]="formattedNotes.value | sanitizeHtml" (keyup)="keyUp.next($event)" >
+  </section>
+</section> -->
+
+
+
+
+<!-- <quill-editor #viewer [readOnly]="true" (onContentChanged)="updateContents($event)">
+  <div quill-editor-toolbar>
+    <span class="ql-formats">
+      <button class="ql-bold" [title]="'Bold'"></button>
+      <button class="ql-italic" [title]="'Italic'"></button>
+      <button class="ql-underline" [title]="'Underline'"></button>
+    </span>
+  </div>
+</quill-editor> -->

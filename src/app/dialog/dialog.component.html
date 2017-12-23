@@ -1,0 +1,46 @@
+
+<section *ngIf="userProfile">
+
+  <section *ngIf="actionType == 'logout'">
+    <section id="user-info-wrapper" >
+      <img id="user-photo" src="{{userProfile.photoURL}}"/>
+      <p id="user-info">{{userProfile.displayName}}  </p>
+    </section>
+    <button md-button id="logout-button" (click)="logout()" md-dialog-close>logout</button>
+  </section>
+
+
+  <section *ngIf="actionType == 'note'">
+
+    <h3>Create New Note</h3>
+    <md-input-container>
+      <input mdInput placeholder="name" [(ngModel)]="name">
+    </md-input-container>
+    <button md-button id="logout-button" (click)="createNote(name)">create</button>
+    <!--  [md-dialog-close]="name" -->
+
+  </section>
+
+  <section *ngIf="actionType == 'folder'">
+
+    <h3>Create New Folder</h3>
+    <md-input-container>
+      <input mdInput placeholder="name" [(ngModel)]="name">
+    </md-input-container>
+    <button md-button id="logout-button" (click)="createFolder(name)">create</button>
+
+  </section>
+
+  <section *ngIf="actionType == 'moveToAdvanced'">
+
+    <h3>Are you sure you want to open the advanced editor</h3>
+    <p>you will no longer be able to use the quick editor</p>
+    <p>we recomend you wait untill after class</p>
+    <button md-button id="logout-button" (click)="switchToAdvancedEditor()">yes</button>
+    <!--  [md-dialog-close]="name" -->
+
+  </section>
+
+
+</section>
+  <md-progress-bar  id="create-progress-bar" *ngIf="loading" mode="indeterminate"></md-progress-bar>

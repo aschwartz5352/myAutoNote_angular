@@ -1,0 +1,64 @@
+<section id="directory-wrapper" [@loadPage]="page" *ngIf="userProfile != 'dirty' && page">
+
+
+  <section id="directory-header">
+    <md-card>
+      <md-card-header id="header-wrapper">
+        <section id="path-wrapper" >
+          <div class="path">
+            <div (click)="home()">Home</div>
+            <md-icon>keyboard_arrow_right</md-icon>
+          </div>
+
+
+          <div class="path" *ngFor="let p of paths; let i = index;">
+            <div (click)="climbTo(p,i)">
+              {{p}}
+            </div><md-icon *ngIf="i < paths.length-1">keyboard_arrow_right</md-icon>
+          </div>
+        </section>
+
+        <!-- <button md-button id="create-button" [mdMenuTriggerFor]="menu">new</button> -->
+
+        <!--
+        <md-icon (click)="createFolder()">create_new_folder</md-icon> -->
+      </md-card-header>
+    </md-card>
+  </section>
+  <button md-fab id="add-folder-fab"  mdTooltip="new note" (click)="createNote()"><md-icon>add_box</md-icon></button>
+  <button md-fab id="add-note-fab"  mdTooltip="new folder" (click)="createFolder()"><md-icon>create_new_folder</md-icon></button>
+  <!-- <md-menu #menu="mdMenu">
+    <button md-menu-item (click)="createNote()"><md-icon >add_box</md-icon> new file </button>
+    <button md-menu-item (click)="createFolder()"><md-icon >create_new_folder</md-icon> new folder</button>
+  </md-menu> -->
+  <section id="items-wrapper">
+  <section *ngFor="let item of items">
+
+    <md-card  class="list-item" (click)="dive(item)">
+      <md-card-header *ngIf="hasChildren(item)">
+        <section class="item-data-wrapper">
+          <section class="folder-icon-wrapper">
+            <md-icon>folder</md-icon>
+          </section>
+          <p class="item-title">{{item}}</p>
+        </section>
+        <!-- <md-icon mdTooltip="more" [mdMenuTriggerFor]="menu">more_vert</md-icon> -->
+      </md-card-header>
+      <md-card-header *ngIf="!hasChildren(item)">
+        <section class="item-data-wrapper">
+          <section class="note-icon-wrapper">
+            <md-icon>description</md-icon>
+          </section>
+          <p class="item-title" *ngIf="directoryService">{{directoryService.navigatePath(item, page, paths)}}</p>
+        </section>
+        <!-- <md-icon  mdTooltip="more">more_vert</md-icon> -->
+      </md-card-header>
+
+    </md-card>
+  </section>
+  <md-menu #menu="mdMenu">
+    <button md-menu-item><md-icon >delete</md-icon> delete </button>
+  </md-menu>
+  </section>
+
+</section>
