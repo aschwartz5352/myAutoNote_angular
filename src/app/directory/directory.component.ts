@@ -75,8 +75,9 @@ export class DirectoryComponent implements OnInit {
             }
 
           });
-        
+
       }
+
     });
   }
 

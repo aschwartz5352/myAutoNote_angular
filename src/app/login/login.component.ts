@@ -24,7 +24,6 @@ export class LoginComponent implements OnInit {
     this.store.select<any>("userProfile").subscribe(storeData => {
       console.log(storeData);
       if(storeData && storeData != "dirty"){
-        console.log("logged inas");
         this.router.navigate(['directory']);
       }
     });

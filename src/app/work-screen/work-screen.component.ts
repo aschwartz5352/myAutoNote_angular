@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import {trigger,state,style,animate,transition,query,animateChild} from '@angular/animations';
 // import { QuillEditorComponent } from 'ngx-quill/src/quill-editor.component';
 import { FormControl } from '@angular/forms';
@@ -12,6 +12,7 @@ import {NoteItemReducer} from '../app-store/reducers/note-item.reducer';
 import {MdDialog} from '@angular/material';
 import {DialogComponent} from '../dialog/dialog.component';
 import {MdSnackBar} from '@angular/material';
+import {WorkingLine} from '../app.component';
 
 @Component({
   selector: 'app-work-screen',
@@ -66,22 +67,44 @@ export class WorkScreenComponent implements OnInit {
   private notePath;
   private noteTitle = "";
 
-  @ViewChild('editorBox') editorBox;
+  @ViewChild('editorbox') editorbox;
+  @ViewChild('editorboxWrapper') editorboxWrapper : ElementRef;
+  @ViewChild('viewer') viewer : ElementRef;
+
+  // @ViewChild('editorbox') editorbox;
+  private currentLineFormControl:FormControl = new FormControl("hello world!");
+  private editorBoxCoords = {top:0, right:300};
+  private workingLineIdx:number = 0;
+  private workingLineArry:WorkingLine[] = [
+    {content:"line 1", style:"header1"},
+    {content:"line 2", style:"header2"},
+    {content:"line 3", style:"header3"},
+    {content:"line 4", style:"header4"},
+    {content:"line 5", style:"normal"},
+    {content:"", style:"normal"}
+  ];
+  // private workingLineArry:WorkingLine[] = [
+  //   {content:"line 1", style:HeaderStyle.HEADER1},
+  //   {content:"line 2", style:HeaderStyle.HEADER2},
+  //   {content:"line 3", style:HeaderStyle.HEADER3},
+  //   {content:"line 4", style:HeaderStyle.HEADER4},
+  //   {content:"line 5", style:HeaderStyle.NORMAL},
+  //   {content:"", style:HeaderStyle.NORMAL}
+  // ];
+  // private working
   // @ViewChild('editor') editor: QuillEditorComponent;
 
   private userProfile;
   private dbNote;
 
-  private viewMode = "quick";
+
   private formattedNotes:string = "";
 
   private contentForm:FormControl = new FormControl("");
 
   private value:string;
 
-  public keyUp = new Subject<string>();
-
-  private viewModes:string[] = ["dual", "left", "right"]
+  // public keyUp = new Subject<string>();
 
   constructor(private workScreenService:WorkScreenService, private db: AngularFireDatabase, private store:Store<any>, private route:ActivatedRoute,
     private router: Router,public dialog: MdDialog, public snackBar: MdSnackBar) {
@@ -106,11 +129,16 @@ export class WorkScreenComponent implements OnInit {
           this.notePath = storeData.path;
 
           this.dbNote = storeData;
-          this.viewMode = (storeData.quickEditMode) ? "quick" : "advanced";
+
           if(this.dbNote){
-            this.value = this.dbNote.noteObject;
+            // this.value = this.dbNote.noteObject;
+            // this.updateContents(this.value);
           }else
             this.value = "";
+            // console.log(this.workingLineArry);
+            this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged().subscribe(val => {this.updateContents(val)});
+            // this.currentLineFormControl.getSelection();
+
 
         }else{
             if(storeUser){
@@ -125,17 +153,22 @@ export class WorkScreenComponent implements OnInit {
 
         }
       });
-      });
+    });
 
   }
 
-  private switchViewMode(newMode:string){
-    this.viewMode = newMode;
+  onCaret(cord: any) {
+    console.log(cord);
+      // let e = document.getSelection().anchorNode.parentElement;
+      // let e1 = document.elementFromPoint(cord.event.pageX, cord.event.pageX);
+      // console.log(e, e1);
+
   }
+
+
 
   private setupViewer(event){
     console.log(event)
-    event.container.inner
   }
 
   private save(){
@@ -144,10 +177,8 @@ export class WorkScreenComponent implements OnInit {
     //this.store.dispatch({type:NoteItemReducer.SAVE_NOTE,payload:{path:this.notePath,quickEditMode:(this.viewMode=="quick"),noteObject:this.value}});
 
     //this.value = "<h1 style='color:#f00' class='textclass' id='testid'>" +this.value + "</h1>";
-    if(this.viewMode == "advanced")
-      this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$1#"+this.formattedNotes)})
-    else
-      this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$0#"+this.value)})
+
+    this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$0#"+this.value)})
 
     this.dirty = false;
     //this.dbNote.set({text:this.value});
@@ -159,17 +190,65 @@ export class WorkScreenComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
       if(result){
-        this.viewMode = "advanced";
         this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$1#"+this.formattedNotes)})
         this.snackBar.open("closed quick editor", "undo", {
           duration: 5000,
         }).onAction().subscribe(() => {
-          this.viewMode = "quick";
           this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$0#"+this.value)})
         });
 
       }
     });
+  }
+
+  private lineClicked(index){
+    // console.log(index);
+      // let lastIndex = e.selectionStart;
+      this.workingLineIdx = index;
+      this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+      this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+      this.editorbox.nativeElement.focus();
+      // e.selectionEnd = lastIndex;
+
+
+  }
+
+  private keyCliked(event,e){
+    // console.log(event);
+    // console.log(e.selectionStart);
+    let lastIndex = e.selectionStart;
+    if(event){
+      switch(event.key){
+        case "ArrowUp":
+          if(this.workingLineIdx > 0){
+            this.workingLineIdx--;
+            this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+            // console.log(this.viewer);
+            // this.editorBoxCoords.right = this.viewer.nativeElement.children[this.workingLineIdx].children[0].clientWidth;
+            this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+            e.selectionEnd = lastIndex;
+            return false;
+          }
+          break;
+        case "ArrowDown":
+          if(this.workingLineIdx < this.workingLineArry.length-1){
+            this.workingLineIdx++;
+            this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+            this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+            e.selectionEnd = lastIndex;
+            return false;
+
+          }
+          break;
+        case "ArrowLeft":
+
+          break;
+        case "ArrowRight":
+
+          break;
+      }
+
+    }
   }
 
   private updateContent(event:any, input:string){
@@ -188,71 +267,14 @@ export class WorkScreenComponent implements OnInit {
 
     this.workScreenService.paddingLevel = [];
     unprocessed.map((lineElement:HTMLElement,i:number) => {
-       //console.dir(lineElement);
+       console.log(lineElement);
          temp += this.workScreenService.parseText(lineElement, (i<unprocessed.length-1)?unprocessed[i+1]:"", 0)+"\n";
-       //let elementObject = Object.assign(lineElement);
-       //console.log(elementObject)
 
-      //  if(lineElement.childNodes.length > 1){
-      //    let childElements = Array.from(lineElement.childNodes).map(child => {
-      //      return {
-      //        tag:child.nodeName,
-      //        text:child.textContent
-      //      }
-      //    });
-      //    console.log(childElements);
-      //    newLine = this.workScreenService.parseText(lineElement, 0)+"\n";
-       //
-      //  }else switch(lineElement.nodeName){
-      //    case "H1":
-      //   case "H2":
-      //   case "H3":
-      //     //console.log("H", lineElement.innerText);
-      //     newLine = this.workScreenService.parseText(lineElement, 0)+"\n";
-      //     ///if(newLine != formattedLines[i])
-      //     //  console.log("new line", newLine, formattedLines[i]);
-      //     temp += newLine
-       //
-      //     break;
-      //   case "P":
-      //     //console.log("P");
-      //     //temp += lineElement.outerHTML;
-      //     newLine = this.workScreenService.parseText(lineElement, 0)+"\n";
-      //     //if(newLine != formattedLines[i])
-      //       //console.log("new line", newLine, formattedLines[i]);
-      //     temp += newLine
-      //     break;
-      //   case "UL":
-      //     //console.log("UL");
-      //     //temp += lineElement.outerHTML;
-      //     break;
-      //   case "OL":
-      //    //console.log("OL");
-      //    //temp += lineElement.outerHTML;
-      //    break;
-       //
-      //  }
+
      });
-    // event.html.split("<p")
-    // //.filter(data => data.length>0)
-    // .map((d,i) => {
-    //   //console.log(d);
-    //   if(!(i == 0 && d.length == 0)){
-    //       if(d.length > 3){
-    //         temp += this.workScreenService.parseText(d.substring(d.indexOf('>')+1, d.length-4), i);
-    //
-    //       }else{
-    //         temp += this.workScreenService.parseText(d, i);
-    //       }
-    //
-    //     lines++;
-    //   }
-    //   });
+
 
        this.formattedNotes = temp;
-
-      //console.log(this.formattedNotes)
-
 
   }
 
@@ -262,64 +284,9 @@ export class WorkScreenComponent implements OnInit {
   }
 
   private updateContents(newContent:string){
-    // let temp = "";
-    // let lines = 0;
-    // let line = window.getSelection().baseNode.parentElement.id;
-    // let carrot = window.getSelection().anchorOffset;
-    // console.log(line,carrot);
-    // //this.editorBox.nativeElement.innerHTML.split("<p");
-    // newContent.split("<p")
-    // //.filter(data => data.length>0)
-    // .map((d,i) => {
-    //   //console.log(d);
-    //   if(!(i == 0 && d.length == 0)){
-    //     console.dir(document.getElementById(i.toString()));
-    //     console.log(i.toString())
-    //     if(i.toString() != line && line != "editor-box"){
-    //       if(d.length > 3){
-    //         //temp += this.workScreenService.parseText(d.substring(d.indexOf('>')+1, d.length-4), i);
-    //         if(document.getElementById(i.toString()))
-    //           document.getElementById(i.toString()).innerHTML = this.workScreenService.parseText(d.substring(d.indexOf('>')+1, d.length-4), i);
-    //       }else{
-    //         //temp += this.workScreenService.parseText(d, i);
-    //         if(document.getElementById(i.toString()))
-    //         document.getElementById(i.toString()).innerHTML = this.workScreenService.parseText(d, i);
-    //       }
-    //     }
-    //     lines++;
-    //   }
-    //   });
+    console.log(newContent);
 
-      //document.getElementById('editor-box').className = 'no-blinker';
-      // this.formattedNotes = temp;
-      //
-      // if(this.formattedNotes.length>0)
-      //   var timer = setInterval(function(){
-      //   //  if((parseInt(line) &&document.getElementById(line)) || document.getElementById(lines.toString())){
-      //       clearInterval(timer);
-      //       //console.dir(document.getElementById(line), );
-      //       //console.log(document.getElementById(line).childNodes[0][length])
-      //       var range = document.createRange();
-      //       var sel = window.getSelection();
-      //       if(line == "editor-box"){
-      //         range.setStart(document.getElementById(lines.toString()).childNodes[0],carrot);
-      //       }else{
-      //         //if(carrot< document.getElementById(line).childNodes[0]['length'])
-      //         range.setStart(document.getElementById(line).childNodes[0],carrot);
-      //       }
-      //
-      //       range.collapse(true);
-      //       sel.removeAllRanges();
-      //       sel.addRange(range);
-      //     //  document.getElementById('editor-box').className = '';
-      //
-      //
-      //     //}
-      //   }, 1);
-
-
-      //console.log(this.formattedNotes)
-
+    this.workingLineArry[this.workingLineIdx] = this.workScreenService.parseText(newContent, "", 0);
 
   }
 

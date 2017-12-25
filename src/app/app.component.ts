@@ -7,6 +7,13 @@ import { Store } from '@ngrx/store';
 import {UserProfileReducer} from './app-store/reducers/user-profile.reducer';
 import {AppLoaderReducer} from './app-store/reducers/app-loader.reducer';
 
+export interface WorkingLine{
+  content: string;
+  style: string;
+}
+
+// export enum HeaderStyle { HEADER1:"header1", HEADER2:"header1", HEADER3:"header1", HEADER4:"header1", NORMAL:"header1"}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

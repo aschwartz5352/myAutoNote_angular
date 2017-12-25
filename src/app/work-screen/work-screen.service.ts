@@ -16,8 +16,9 @@ export class WorkScreenService{
 
     let data = {
       raw:content.innerText,
-      content:content.innerText.replace(/<script>/g, "&lt;script&gt;"),//.replace(/</script>/g, "&lt;script&gt;/"),
-          words:content.innerText.split(" "),
+      // content:content.innerText.replace(/<script>/g, "&lt;script&gt;"),//.replace(/</script>/g, "&lt;script&gt;/"),
+      content:content,
+          words:content.split(" "),
           lineNumber:0,
           vocab:-1,
           bulletPointLevel:0,
@@ -32,32 +33,32 @@ export class WorkScreenService{
 
     data.lineNumber = index;
 
-    if(content.childNodes.length > 1){
-      let childLength = 0;
-      Array.from(content.childNodes).map((child:any) => {
-        switch(child.nodeName){
-          case "STRONG":
-            data.bold.push(childLength);
-            data.bold.push(child.length);
-            break;
-          case "U":
-            data.underline.push(childLength);
-            data.underline.push(child.length);
-            break;
-          case "EM":
-            data.italic.push(childLength);
-            data.italic.push(child.length);
-            break;
-        }
-        childLength += child.length;
-
-        // return {
-        //   tag:child.nodeName,
-        //   text:child.textContent
-        // }
-      });
-
-    }
+    // if(content.childNodes.length > 1){
+    //   let childLength = 0;
+    //   Array.from(content.childNodes).map((child:any) => {
+    //     switch(child.nodeName){
+    //       case "STRONG":
+    //         data.bold.push(childLength);
+    //         data.bold.push(child.length);
+    //         break;
+    //       case "U":
+    //         data.underline.push(childLength);
+    //         data.underline.push(child.length);
+    //         break;
+    //       case "EM":
+    //         data.italic.push(childLength);
+    //         data.italic.push(child.length);
+    //         break;
+    //     }
+    //     childLength += child.length;
+    //
+    //     // return {
+    //     //   tag:child.nodeName,
+    //     //   text:child.textContent
+    //     // }
+    //   });
+    //
+    // }
 
     data = this.isBulletPoint(data);
 
@@ -67,7 +68,7 @@ export class WorkScreenService{
     data = this.isTitle(data, nextContent);
     data = this.isMathExpression(data);
 
-    let temp =  this.print(data);
+    let temp =  this.printParsed(data);
     //console.log(temp)
     return  temp;
   }
@@ -285,6 +286,28 @@ public isMathExpression(data){
 	//var letterNumber = /^[A-Za-z0-9 _]*[A-Za-z0-9][A-Za-z0-9 _]*$/;
 	//return a.match(letterNumber);
 
+}
+
+public printParsed(data){
+  let temp = {content : data.content, style:""};
+  switch(data.headerSize){
+    case 4:
+    temp.style = "header1";
+    break;
+    case 3:
+    temp.style = "header2";
+    break;
+    case 2:
+    temp.style = "header3";
+    break;
+    case 1:
+    temp.style = "header4";
+    break;
+    case 0:
+    temp.style = "normal";
+    break;
+  }
+  return temp;
 }
 
 public print(data){
