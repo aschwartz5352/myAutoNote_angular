@@ -5,17 +5,18 @@ import * as mexp from 'math-expression-evaluator';
 export class WorkScreenService{
 
   public paddingLevel = [];
+  public tabs = [];
   private pad1 = 0;
   private pad2 = 0;
   private pad3 = 0;
 
   constructor(){}
 
-  public parseText(content, nextContent, index:number){
+  public parseText(content:string, tabs:number[], index:number){
 
 
     let data = {
-      raw:content.innerText,
+      raw:content,
       // content:content.innerText.replace(/<script>/g, "&lt;script&gt;"),//.replace(/</script>/g, "&lt;script&gt;/"),
       content:content,
           words:content.split(" "),
@@ -32,6 +33,8 @@ export class WorkScreenService{
           italic:[]};
 
     data.lineNumber = index;
+
+    this.tabs = tabs;
 
     // if(content.childNodes.length > 1){
     //   let childLength = 0;
@@ -65,7 +68,7 @@ export class WorkScreenService{
     data = this.isHeader(data);
     data = this.isVocab(data);
 
-    data = this.isTitle(data, nextContent);
+    data = this.isTitle(data);
     data = this.isMathExpression(data);
 
     let temp =  this.printParsed(data);
@@ -89,7 +92,7 @@ export class WorkScreenService{
     return data;
   }
 
-  public isTitle(data, nextContent){
+  public isTitle(data){
     //console.log(nextContent);
     var content, words,score;
 
@@ -115,11 +118,11 @@ export class WorkScreenService{
 		}
 		if(score/words.length >= 0.6){
       //if(nextIsHeader)
-      console.log(this.pad1, this.pad2, this.pad3)
+      // console.log(this.pad1, this.pad2, this.pad3)
 			   //data.headerSize = 3;
     //  else
-    if(this.pad3){
-      if(this.pad2)
+    if(this.tabs[0]){
+      if(this.tabs[2])
         data.headerSize = 2;
       else
         data.headerSize = 3;
@@ -288,8 +291,9 @@ public isMathExpression(data){
 
 }
 
-public printParsed(data){
-  let temp = {content : data.content, style:""};
+public printParsed(data):WorkingLine{
+  // console.log(data.content);
+  let temp:WorkingLine = {content : data.content, style:"", tabs:0, tabLevels:[0,0,0]};
   switch(data.headerSize){
     case 4:
     temp.style = "header1";
@@ -307,6 +311,32 @@ public printParsed(data){
     temp.style = "normal";
     break;
   }
+  if(data.headerSize > 0){
+    if(data.headerSize == 4){
+      this.tabs[0] = 3;
+      this.tabs[1] = 0;
+      this.tabs[2] = 0;
+    }
+    if(data.headerSize == 3){
+      this.tabs[2] = 2;
+      this.tabs[1] = 0;
+    }
+    if(data.headerSize == 2){
+      this.tabs[1] = 2;
+    }
+  }
+
+  if(data.headerSize > 0){
+    if(data.headerSize != 4)
+      temp.tabs += this.tabs[0];
+    if(data.headerSize != 3)
+      temp.tabs  += this.tabs[2];
+    if(data.headerSize != 2)
+      temp.tabs  += this.tabs[1];
+  }else
+    temp.tabs  += (this.tabs[0]+this.tabs[1]+this.tabs[2]);
+    // console.log("TABS",temp.tabs);
+    temp.tabLevels = this.tabs
   return temp;
 }
 
@@ -335,8 +365,8 @@ public print(data){
           //this.paddingLevel == [];
           //data.padding = "";
           this.pad3 = 5;
-          this.pad1 = 0;
           this.pad2 = 0;
+          this.pad1 = 0;
         }
         if(data.headerSize == 3){
           this.pad2 = 3;

@@ -27,7 +27,7 @@ import { UserProfileEffects } from './app-store/effects/user-profile.effect';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
-import {MaterialModule,MdDialogModule} from '@angular/material';
+import {MatDialogModule, MatMenuModule, MatSnackBarModule, MatCardModule, MatIconModule,MatButtonModule, MatProgressBarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
@@ -39,6 +39,8 @@ import { LoginComponent } from './login/login.component';
 import { FormattedLineComponent } from './formatted-line/formatted-line.component'
 
 export const firebaseConfig = environment.firebaseConfig;
+
+
 
 @NgModule({
   declarations: [
@@ -56,8 +58,9 @@ export const firebaseConfig = environment.firebaseConfig;
   imports: [
     BrowserModule,
     AppRoutingModule,
-    MaterialModule,
-    MdDialogModule,
+    // MaterialModule,
+    MatMenuModule, MatSnackBarModule,MatCardModule,MatIconModule,MatButtonModule,MatProgressBarModule,
+    MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,

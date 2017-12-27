@@ -7,7 +7,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {DialogComponent} from '../dialog/dialog.component';
 import {NoteItemReducer} from '../app-store/reducers/note-item.reducer';
 import {AppLoaderReducer} from '../app-store/reducers/app-loader.reducer';
@@ -44,7 +44,7 @@ export class DirectoryComponent implements OnInit {
   private onPage:boolean = true;
   private dialogRef;
 
-  constructor(private db: AngularFireDatabase, private store:Store<any>, private router: Router, public dialog: MdDialog, private directoryService:DirectoryService) { }
+  constructor(private db: AngularFireDatabase, private store:Store<any>, private router: Router, public dialog: MatDialog, private directoryService:DirectoryService) { }
 
   ngOnInit() {
     this.store.select<any>("userProfile").subscribe(storeData => {

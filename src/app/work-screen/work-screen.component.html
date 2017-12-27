@@ -1,11 +1,11 @@
 <section @loadPage id="note-header">
   <section id="note-header-left">
-    <md-icon (click)="back()" mdTooltip="choose a different note">arrow_back</md-icon>
+    <mat-icon (click)="back()" mdTooltip="choose a different note">arrow_back</mat-icon>
 
     <h3 mdTooltip="click to change title" >{{notePath}}</h3>
 
   </section>
-<md-icon id="save-icon" mdTooltip="save" (click)="save()">save</md-icon>
+<mat-icon id="save-icon" mdTooltip="save" (click)="save()">save</mat-icon>
 </section>
 <!-- <section [@loadPage]="notePath" *ngIf="false"> -->
 <section [@loadPage]="notePath" *ngIf="dbNote">
@@ -14,19 +14,20 @@
 
 
 
-      <md-card  [style.top]="editorBoxCoords.top+'px'" [style.right]="editorBoxCoords.right+'px'" id="editorbox-card">
+      <!-- <mat-card  [style.top]="editorBoxCoords.top+'px'" [style.right]="editorBoxCoords.right+'px'" id="editorbox-card">
         <textarea autofocus #editorbox  id="editorbox" placeholder="insert text here" [formControl]="currentLineFormControl" (keydown)="keyCliked($event, editorbox)"></textarea>
-      </md-card>
-
-      <md-card id="editor-card">
-        <md-card-content #viewer id="viewer">
+      </mat-card> -->
+<!-- (keyup)="updateContents($event,viewer)" keyUp.next($event) -->
+      <mat-card id="editor-card">
+        <mat-card-content #viewer id="viewer"  contenteditable="true"  (keydown)="keyDownCliked($event)" (keyup)="updateContents($event, viewer)">
           <formatted-line *ngFor="let line of workingLineArry; let i = index;"
             [workingLineData]="line"
             index="{{i}}"
             selected="{{(workingLineIdx==i)?'selected':''}}"
-            (onClick)="lineClicked(i)"></formatted-line>
-        </md-card-content>
-      </md-card>
+            (onClick)="lineClicked(i)"
+          ></formatted-line>
+        </mat-card-content>
+      </mat-card>
 
 
 
@@ -42,17 +43,17 @@
   <section id="editor-header">
     <section id="editor-header-left">
       <button (click)="format('bold', $event)">
-        <md-icon >format_bold</md-icon>
+        <mat-icon >format_bold</mat-icon>
       </button>
       <button (click)="format('italic', $event)">
-        <md-icon >format_italic</md-icon>
+        <mat-icon >format_italic</mat-icon>
       </button>
       <button (click)="format('underline', $event)">
-        <md-icon >format_underline</md-icon>
+        <mat-icon >format_underline</mat-icon>
       </button>
     </section>
     <section id="editor-header-right">
-      <md-icon mdTooltip="save" (click)="save()">save</md-icon>
+      <mat-icon mdTooltip="save" (click)="save()">save</mat-icon>
     </section>
 
   </section>

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {MdDialog, MdDialogRef,MD_DIALOG_DATA} from '@angular/material';
+import {MatDialog, MatDialogRef,MAT_DIALOG_DATA} from '@angular/material';
 import { AngularFireAuth } from 'angularfire2/auth';
 import {UserProfileReducer} from '../app-store/reducers/user-profile.reducer';
 import {DirectoryReducer} from '../app-store/reducers/directory.reducer';
@@ -26,7 +26,7 @@ export class DialogComponent implements OnInit {
   private loading = false;
 
 
-  constructor(private store:Store<any>,public dialogRef: MdDialogRef<DialogComponent>, private afAuth: AngularFireAuth, private directoryService:DirectoryService) { }
+  constructor(private store:Store<any>,public dialogRef: MatDialogRef<DialogComponent>, private afAuth: AngularFireAuth, private directoryService:DirectoryService) { }
 
   ngOnInit() {
     this.store.select<any>("userProfile").subscribe(storeData => {

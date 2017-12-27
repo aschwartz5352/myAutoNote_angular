@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, HostListener } from '@angular/core';
 import {trigger,state,style,animate,transition,query,animateChild} from '@angular/animations';
 // import { QuillEditorComponent } from 'ngx-quill/src/quill-editor.component';
 import { FormControl } from '@angular/forms';
@@ -9,10 +9,11 @@ import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} f
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import {NoteItemReducer} from '../app-store/reducers/note-item.reducer';
-import {MdDialog} from '@angular/material';
+import {MatDialog} from '@angular/material';
 import {DialogComponent} from '../dialog/dialog.component';
-import {MdSnackBar} from '@angular/material';
-import {WorkingLine} from '../app.component';
+import {MatSnackBar} from '@angular/material';
+// import {WorkingLine} from '../app.component';
+// import {WorkingLine} from '../../typings.d';
 
 @Component({
   selector: 'app-work-screen',
@@ -67,8 +68,8 @@ export class WorkScreenComponent implements OnInit {
   private notePath;
   private noteTitle = "";
 
-  @ViewChild('editorbox') editorbox;
-  @ViewChild('editorboxWrapper') editorboxWrapper : ElementRef;
+  // @ViewChild('editorbox') editorbox;
+  // @ViewChild('editorboxWrapper') editorboxWrapper : ElementRef;
   @ViewChild('viewer') viewer : ElementRef;
 
   // @ViewChild('editorbox') editorbox;
@@ -76,12 +77,12 @@ export class WorkScreenComponent implements OnInit {
   private editorBoxCoords = {top:0, right:300};
   private workingLineIdx:number = 0;
   private workingLineArry:WorkingLine[] = [
-    {content:"line 1", style:"header1"},
-    {content:"line 2", style:"header2"},
-    {content:"line 3", style:"header3"},
-    {content:"line 4", style:"header4"},
-    {content:"line 5", style:"normal"},
-    {content:"", style:"normal"}
+    {content:"line 1", style:"header1", tabLevels:[0,0,0], tabs:0},
+    {content:"line 2", style:"header2", tabLevels:[0,0,0], tabs:1},
+    {content:"line 3", style:"header3", tabLevels:[0,0,0], tabs:2},
+    {content:"line 4", style:"header4", tabLevels:[0,0,0], tabs:3},
+    {content:"line 5", style:"normal", tabLevels:[0,0,0], tabs:3},
+    {content:"", style:"normal", tabLevels:[0,0,0], tabs:3}
   ];
   // private workingLineArry:WorkingLine[] = [
   //   {content:"line 1", style:HeaderStyle.HEADER1},
@@ -106,17 +107,20 @@ export class WorkScreenComponent implements OnInit {
 
   // public keyUp = new Subject<string>();
 
+
+
   constructor(private workScreenService:WorkScreenService, private db: AngularFireDatabase, private store:Store<any>, private route:ActivatedRoute,
-    private router: Router,public dialog: MdDialog, public snackBar: MdSnackBar) {
+    private router: Router,public dialog: MatDialog, public snackBar: MatSnackBar) {
     // const observable = this.keyUp
-    // .map(value => event.target['innerHTML'])
-    // .debounceTime(250)
-    // .distinctUntilChanged()
-    //   .flatMap((search) => {
-    //     return Observable.of(search)//.delay(500);
-    //   })
+    // .map((value) => event)
+    // .debounceTime(150)
+    // // .distinctUntilChanged()
+    //   // .flatMap((search) => {
+    //   //   return Observable.of(search)//.delay(500);
+    //   // })
     // .subscribe((data) => {
     //   this.updateContents(data);
+    //
     // });
   }
 
@@ -136,7 +140,7 @@ export class WorkScreenComponent implements OnInit {
           }else
             this.value = "";
             // console.log(this.workingLineArry);
-            this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged().subscribe(val => {this.updateContents(val)});
+            // this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged().subscribe(val => {this.updateContents(val)});
             // this.currentLineFormControl.getSelection();
 
 
@@ -155,6 +159,18 @@ export class WorkScreenComponent implements OnInit {
       });
     });
 
+  }
+
+  ngAfterViewInit(){
+    for(let i = 0; i < this.workingLineArry.length; i++){
+      let temp = this.workScreenService.parseText(this.workingLineArry[i].content, (i == 0) ? [0,0,0] : this.workingLineArry[i-1].tabLevels, 0);
+      // console.log(temp.style,this.workingLineArry[i].content);
+      this.workingLineArry[i].style = temp.style;
+      this.workingLineArry[i].tabs = temp.tabs;
+      this.workingLineArry[i].tabLevels = temp.tabLevels;
+
+
+    }
   }
 
   onCaret(cord: any) {
@@ -207,7 +223,7 @@ export class WorkScreenComponent implements OnInit {
       this.workingLineIdx = index;
       this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
       this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
-      this.editorbox.nativeElement.focus();
+      // this.editorbox.nativeElement.focus();
       // e.selectionEnd = lastIndex;
 
 
@@ -251,6 +267,123 @@ export class WorkScreenComponent implements OnInit {
     }
   }
 
+  //@HostListener('document:keydown', ['$event'])
+  //handleKeyboardEvent(event: KeyboardEvent) {
+  private keyDownCliked(event){
+    // let lastIndex = e.selectionStart;
+    if(event){
+      switch(event.key){
+        case "ArrowUp":
+          // if(this.workingLineIdx > 0){
+          //   this.workingLineIdx--;
+          //   this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+          //   // console.log(this.viewer);
+          //   // this.editorBoxCoords.right = this.viewer.nativeElement.children[this.workingLineIdx].children[0].clientWidth;
+          //   this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+          //   // this.viewer.nativeElement.children[this.workingLineIdx].focus();
+          //   // this.viewer.nativeElement.children[this.workingLineIdx].selectionStart = 2;
+          //   // this.viewer.nativeElement.children[this.workingLineIdx].focus();
+          //   // e.selectionEnd = lastIndex;
+          //   // return false;
+          // }
+          break;
+        case "ArrowDown":
+          // if(this.workingLineIdx < this.workingLineArry.length-1){
+          //   this.workingLineIdx++;
+          //   this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+          //   this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+          //   // this.viewer.nativeElement.children[this.workingLineIdx].focus();
+          //   // this.viewer.nativeElement.children[this.workingLineIdx].focus();
+          //   // e.selectionEnd = lastIndex;
+          //   // return false;
+          //
+          // }
+          break;
+        case "Enter":
+        console.log(this.workingLineIdx);
+          let newLine:WorkingLine = {
+              content:"",
+              style: "normal",
+              tabs: 0,
+              tabLevels: this.workingLineArry[this.workingLineIdx].tabLevels
+            }
+          this.workingLineArry.splice( this.workingLineIdx+1, 0, newLine );
+          this.workingLineIdx++;
+          let temp = this.workScreenService.parseText("", this.workingLineArry[this.workingLineIdx-1].tabLevels, 0);
+          this.workingLineArry[this.workingLineIdx].style = temp.style;
+          this.workingLineArry[this.workingLineIdx].tabs = temp.tabs;
+          this.workingLineArry[this.workingLineIdx].tabLevels = temp.tabLevels;
+          this.insertedNewLine = true;
+
+
+          // var timer = setInterval();
+
+          return false;
+        case "ArrowRight":
+
+          break;
+      }
+
+    }
+  }
+
+  private insertedNewLine:boolean = false;
+
+  ngAfterViewChecked(){
+    if(this.insertedNewLine){
+      this.insertedNewLine = false;
+      var node = this.viewer.nativeElement;
+      node.focus();
+      var textNode = node.children[this.workingLineIdx].firstChild;
+      var caret = 0; // insert caret after the 10th character say
+      var range = document.createRange();
+      range.setStart(textNode, caret);
+      range.setEnd(textNode, caret);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      // sel.getRangeAt(0).setStart(node.children[this.workingLineIdx-1].firstChild,node.children[this.workingLineIdx-1].innerText.length+1);
+      sel.addRange(range);
+    }
+  }
+
+  private padding = [];
+
+  private updateContents(event, e){
+    if(event.key == "Enter"){
+
+      console.log(this.workingLineArry);
+      return false;
+
+    }
+    if(event.key == "Shift" || event.key == "Control" || event.key == "ArrowRight" || event.key == "ArrowLeft" || event.key == "ArrowUp" || event.key == "ArrowDown"){
+      return;
+    }
+    console.log(event);
+    // console.log(e.children[this.workingLineIdx].innerText);
+    // console.log(this.workingLineArry[this.workingLineIdx].content);
+    // let temp = document.getSelection().anchorOffset;
+    // console.log(document.getSelection());
+
+    // console.log(newContent,this.workingLineIdx, temp);
+    for(let i = this.workingLineIdx; i < this.workingLineArry.length; i++){
+
+      let temp = this.workScreenService.parseText(e.children[i].innerText, (i == 0) ? [0,0,0] : this.workingLineArry[i-1].tabLevels, 0);
+      // console.log(temp.style,this.workingLineArry[i].content);
+      // this.workingLineArry[i].content = temp.content;
+      this.workingLineArry[i].style = temp.style;
+      this.workingLineArry[i].tabs = temp.tabs;
+      this.workingLineArry[i].tabLevels = temp.tabLevels;
+      // console.log()
+
+    }
+    // this.workingLineArry[this.workingLineIdx].content = temp.content;
+    // event.selectionStart = temp;
+    // this.viewer.nativeElement.children[this.workingLineIdx].focus();
+    // this.viewer.nativeElement.children[this.workingLineIdx].selectionStart = 2;
+    // event.setSelectionRange(temp,temp);
+
+  }
+
   private updateContent(event:any, input:string){
     let temp = "";
     let formattedLines = this.formattedNotes.split("\n");
@@ -267,8 +400,8 @@ export class WorkScreenComponent implements OnInit {
 
     this.workScreenService.paddingLevel = [];
     unprocessed.map((lineElement:HTMLElement,i:number) => {
-       console.log(lineElement);
-         temp += this.workScreenService.parseText(lineElement, (i<unprocessed.length-1)?unprocessed[i+1]:"", 0)+"\n";
+       // console.log(lineElement);
+         // temp += this.workScreenService.parseText(lineElement, (i<unprocessed.length-1)?unprocessed[i+1]:"", 0)+"\n";
 
 
      });
@@ -283,12 +416,6 @@ export class WorkScreenComponent implements OnInit {
 
   }
 
-  private updateContents(newContent:string){
-    console.log(newContent);
-
-    this.workingLineArry[this.workingLineIdx] = this.workScreenService.parseText(newContent, "", 0);
-
-  }
 
 
 
