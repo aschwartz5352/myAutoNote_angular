@@ -2,6 +2,4 @@
 *ngIf="workingLineData && workingLineData.style"
 [ngClass]="[workingLineData.style, selected]"
 [style.paddingLeft]="workingLineData.tabs*10+'px'"
-(click)="onLineClick()">
-{{workingLineData.content}}
-</div>
+(click)="onLineClick()" [innerHTML]="workingLineData.content"></div>

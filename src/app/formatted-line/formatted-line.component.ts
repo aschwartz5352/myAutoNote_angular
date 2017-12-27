@@ -36,6 +36,9 @@ export class FormattedLineComponent implements OnInit {
    }
 
   ngOnInit() {
+    if(this.workingLineData.content.length == 0){
+      console.log("empty");
+    }
     // this.currentLineFormControl.setValue(this.workingLineData.content);
     // this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged().subscribe(val => {
     //   console.log(val);

@@ -77,8 +77,8 @@ export class WorkScreenComponent implements OnInit {
   private editorBoxCoords = {top:0, right:300};
   private workingLineIdx:number = 0;
   private workingLineArry:WorkingLine[] = [
-    {content:"line 1", style:"header1", tabLevels:[0,0,0], tabs:0},
-    {content:"line 2", style:"header2", tabLevels:[0,0,0], tabs:1},
+    {content:"line&nbsp;1", style:"header1", tabLevels:[0,0,0], tabs:0},
+    {content:"line&nbsp;2", style:"header2", tabLevels:[0,0,0], tabs:1},
     {content:"line 3", style:"header3", tabLevels:[0,0,0], tabs:2},
     {content:"line 4", style:"header4", tabLevels:[0,0,0], tabs:3},
     {content:"line 5", style:"normal", tabLevels:[0,0,0], tabs:3},
@@ -162,15 +162,16 @@ export class WorkScreenComponent implements OnInit {
   }
 
   ngAfterViewInit(){
-    for(let i = 0; i < this.workingLineArry.length; i++){
-      let temp = this.workScreenService.parseText(this.workingLineArry[i].content, (i == 0) ? [0,0,0] : this.workingLineArry[i-1].tabLevels, 0);
+    this.workingLineArry.map((line, i) => {
+      let temp = this.workScreenService.parseText(line.content, (i == 0) ? [0,0,0] : this.workingLineArry[i-1].tabLevels, 0);
       // console.log(temp.style,this.workingLineArry[i].content);
-      this.workingLineArry[i].style = temp.style;
-      this.workingLineArry[i].tabs = temp.tabs;
-      this.workingLineArry[i].tabLevels = temp.tabLevels;
+      line.content = temp.content.replace(/ /g, "&nbsp;");
+      line.style = temp.style;
+      line.tabs = temp.tabs;
+      line.tabLevels = temp.tabLevels;
 
+    });
 
-    }
   }
 
   onCaret(cord: any) {
@@ -269,7 +270,7 @@ export class WorkScreenComponent implements OnInit {
 
   //@HostListener('document:keydown', ['$event'])
   //handleKeyboardEvent(event: KeyboardEvent) {
-  private keyDownCliked(event){
+  private keyDownCliked(event, e){
     // let lastIndex = e.selectionStart;
     if(event){
       switch(event.key){
@@ -300,19 +301,25 @@ export class WorkScreenComponent implements OnInit {
           // }
           break;
         case "Enter":
-        console.log(this.workingLineIdx);
+          console.log(this.workingLineIdx, window.getSelection().getRangeAt(0), window.getSelection().rangeCount);
+          let origionalText = this.viewer.nativeElement.children[this.workingLineIdx].innerText;
+          let splitIndex = window.getSelection().getRangeAt(0).endOffset;
+          // if(this.workingLineArry[this.workingLineIdx].style == "normal") splitIndex--;
           let newLine:WorkingLine = {
-              content:"",
+              content:origionalText.substring(splitIndex),
               style: "normal",
               tabs: 0,
               tabLevels: this.workingLineArry[this.workingLineIdx].tabLevels
             }
+            // console.log(window.getSelection().getRangeAt(0).startOffset);
+            // console.log(this.viewer.nativeElement.children[this.workingLineIdx].innerText.substring(window.getSelection().getRangeAt(0).endOffset));
+            this.workingLineArry[this.workingLineIdx].content = origionalText.substring(0,splitIndex);
           this.workingLineArry.splice( this.workingLineIdx+1, 0, newLine );
           this.workingLineIdx++;
-          let temp = this.workScreenService.parseText("", this.workingLineArry[this.workingLineIdx-1].tabLevels, 0);
-          this.workingLineArry[this.workingLineIdx].style = temp.style;
-          this.workingLineArry[this.workingLineIdx].tabs = temp.tabs;
-          this.workingLineArry[this.workingLineIdx].tabLevels = temp.tabLevels;
+          // let temp = this.workScreenService.parseText("", this.workingLineArry[this.workingLineIdx-1].tabLevels, 0);
+          // this.workingLineArry[this.workingLineIdx].style = temp.style;
+          // this.workingLineArry[this.workingLineIdx].tabs = temp.tabs;
+          // this.workingLineArry[this.workingLineIdx].tabLevels = temp.tabLevels;
           this.insertedNewLine = true;
 
 
@@ -335,7 +342,7 @@ export class WorkScreenComponent implements OnInit {
       var node = this.viewer.nativeElement;
       node.focus();
       var textNode = node.children[this.workingLineIdx].firstChild;
-      var caret = 0; // insert caret after the 10th character say
+      var caret = 0;
       var range = document.createRange();
       range.setStart(textNode, caret);
       range.setEnd(textNode, caret);
@@ -351,14 +358,14 @@ export class WorkScreenComponent implements OnInit {
   private updateContents(event, e){
     if(event.key == "Enter"){
 
-      console.log(this.workingLineArry);
+      // console.log(this.workingLineArry);
       return false;
 
     }
     if(event.key == "Shift" || event.key == "Control" || event.key == "ArrowRight" || event.key == "ArrowLeft" || event.key == "ArrowUp" || event.key == "ArrowDown"){
       return;
     }
-    console.log(event);
+    // console.log(event);
     // console.log(e.children[this.workingLineIdx].innerText);
     // console.log(this.workingLineArry[this.workingLineIdx].content);
     // let temp = document.getSelection().anchorOffset;
