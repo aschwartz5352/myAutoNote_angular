@@ -1,3 +1,7 @@
-<div *ngIf="workingLineData && workingLineData.style" [ngClass]="[workingLineData.style, selected]"
-(click)="onLineClick()"
->{{workingLineData.content}}</div>
+<div
+*ngIf="workingLineData && workingLineData.style"
+[ngClass]="[workingLineData.style, selected]"
+[style.paddingLeft]="workingLineData.tabs*10+'px'"
+(click)="onLineClick()">
+{{workingLineData.content}}
+</div>
