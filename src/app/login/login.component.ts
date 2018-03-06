@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
-import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
+import {AngularFireDatabase} from 'angularfire2/database';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
@@ -22,7 +22,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.store.select<any>("userProfile").subscribe(storeData => {
-      console.log(storeData);
+      // console.log(storeData);
       if(storeData && storeData != "dirty"){
         this.router.navigate(['directory']);
       }

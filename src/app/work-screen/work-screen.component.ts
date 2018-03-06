@@ -5,7 +5,7 @@ import { FormControl } from '@angular/forms';
 import 'rxjs/add/operator/debounceTime';
 import {Subject, Observable} from 'rxjs';
 import { WorkScreenService } from './work-screen.service';
-import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} from 'angularfire2/database';
+import {AngularFireDatabase} from 'angularfire2/database';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import {NoteItemReducer} from '../app-store/reducers/note-item.reducer';
@@ -77,12 +77,12 @@ export class WorkScreenComponent implements OnInit {
   private editorBoxCoords = {top:0, right:300};
   private workingLineIdx:number = 0;
   private workingLineArry:WorkingLine[] = [
-    {content:"line&nbsp;1", style:"header1", tabLevels:[0,0,0], tabs:0},
-    {content:"line&nbsp;2", style:"header2", tabLevels:[0,0,0], tabs:1},
-    {content:"line 3", style:"header3", tabLevels:[0,0,0], tabs:2},
-    {content:"line 4", style:"header4", tabLevels:[0,0,0], tabs:3},
-    {content:"line 5", style:"normal", tabLevels:[0,0,0], tabs:3},
-    {content:"", style:"normal", tabLevels:[0,0,0], tabs:3}
+    {content:"", style:"normal", tabLevels:[0,0,0], tabs:0}
+    // {content:"line&nbsp;2", style:"header2", tabLevels:[0,0,0], tabs:1},
+    // {content:"line 3", style:"header3", tabLevels:[0,0,0], tabs:2},
+    // {content:"line 4", style:"header4", tabLevels:[0,0,0], tabs:3},
+    // {content:"line 5", style:"normal", tabLevels:[0,0,0], tabs:3},
+    // {content:"", style:"normal", tabLevels:[0,0,0], tabs:3}
   ];
   // private workingLineArry:WorkingLine[] = [
   //   {content:"line 1", style:HeaderStyle.HEADER1},
@@ -230,42 +230,46 @@ export class WorkScreenComponent implements OnInit {
 
   }
 
+  private setFocusToEnd(e){
+    e.focus();
+  }
+
   private keyCliked(event,e){
     // console.log(event);
     // console.log(e.selectionStart);
-    let lastIndex = e.selectionStart;
-    if(event){
-      switch(event.key){
-        case "ArrowUp":
-          if(this.workingLineIdx > 0){
-            this.workingLineIdx--;
-            this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
-            // console.log(this.viewer);
-            // this.editorBoxCoords.right = this.viewer.nativeElement.children[this.workingLineIdx].children[0].clientWidth;
-            this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
-            e.selectionEnd = lastIndex;
-            return false;
-          }
-          break;
-        case "ArrowDown":
-          if(this.workingLineIdx < this.workingLineArry.length-1){
-            this.workingLineIdx++;
-            this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
-            this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
-            e.selectionEnd = lastIndex;
-            return false;
-
-          }
-          break;
-        case "ArrowLeft":
-
-          break;
-        case "ArrowRight":
-
-          break;
-      }
-
-    }
+    // let lastIndex = e.selectionStart;
+    // if(event){
+    //   switch(event.key){
+    //     case "ArrowUp":
+    //       if(this.workingLineIdx > 0){
+    //         this.workingLineIdx--;
+    //         this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+    //         // console.log(this.viewer);
+    //         // this.editorBoxCoords.right = this.viewer.nativeElement.children[this.workingLineIdx].children[0].clientWidth;
+    //         this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+    //         e.selectionEnd = lastIndex;
+    //         return false;
+    //       }
+    //       break;
+    //     case "ArrowDown":
+    //       if(this.workingLineIdx < this.workingLineArry.length-1){
+    //         this.workingLineIdx++;
+    //         this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+    //         this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
+    //         e.selectionEnd = lastIndex;
+    //         return false;
+    //
+    //       }
+    //       break;
+    //     case "ArrowLeft":
+    //
+    //       break;
+    //     case "ArrowRight":
+    //
+    //       break;
+    //   }
+    //
+    // }
   }
 
   //@HostListener('document:keydown', ['$event'])
@@ -301,7 +305,10 @@ export class WorkScreenComponent implements OnInit {
           // }
           break;
         case "Enter":
-          console.log(this.workingLineIdx, window.getSelection().getRangeAt(0), window.getSelection().rangeCount);
+          if(window.getSelection().getRangeAt(0).endContainer.parentElement.id.length > 0)
+            this.workingLineIdx = parseInt(window.getSelection().getRangeAt(0).endContainer.parentElement.id);
+            else console.log("!");
+          console.log(this.workingLineIdx, window.getSelection().getRangeAt(0), window.getSelection().getRangeAt(0).endContainer.parentElement.id);
           let origionalText = this.viewer.nativeElement.children[this.workingLineIdx].innerText;
           let splitIndex = window.getSelection().getRangeAt(0).endOffset;
           // if(this.workingLineArry[this.workingLineIdx].style == "normal") splitIndex--;
@@ -365,7 +372,7 @@ export class WorkScreenComponent implements OnInit {
     if(event.key == "Shift" || event.key == "Control" || event.key == "ArrowRight" || event.key == "ArrowLeft" || event.key == "ArrowUp" || event.key == "ArrowDown"){
       return;
     }
-    // console.log(event);
+    console.log(event);
     // console.log(e.children[this.workingLineIdx].innerText);
     // console.log(this.workingLineArry[this.workingLineIdx].content);
     // let temp = document.getSelection().anchorOffset;

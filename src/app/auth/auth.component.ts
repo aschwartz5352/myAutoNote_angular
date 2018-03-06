@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} from 'angularfire2/database';
+import {AngularFireDatabase} from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
+// import { FirebaseApp } from '@firebase/app-types';
+// import { FirebaseDatabase } from '@firebase/database-types';
+// import { FirebaseMessaging } from '@firebase/messaging-types';
+// import { FirebaseStorage } from '@firebase/storage-types';
+// import { FirebaseFirestore } from '@firebase/firestore-types';
 import { Store } from '@ngrx/store';
 import {UserProfileReducer} from '../app-store/reducers/user-profile.reducer';
 
@@ -16,7 +21,7 @@ import {UserProfileReducer} from '../app-store/reducers/user-profile.reducer';
 export class AuthComponent implements OnInit {
 
   user: Observable<firebase.User>;
-  items: FirebaseListObservable<any[]>;
+  // items: FirebaseListObservable<any[]>;
   private item;
   forms:any[] = [];
 

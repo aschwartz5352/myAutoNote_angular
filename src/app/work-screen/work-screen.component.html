@@ -18,8 +18,8 @@
         <textarea autofocus #editorbox  id="editorbox" placeholder="insert text here" [formControl]="currentLineFormControl" (keydown)="keyCliked($event, editorbox)"></textarea>
       </mat-card> -->
 <!-- (keyup)="updateContents($event,viewer)" keyUp.next($event) -->
-      <mat-card id="editor-card">
-        <mat-card-content #viewer id="viewer"  contenteditable="true"  (keydown)="keyDownCliked($event, viewer)" (keyup)="updateContents($event, viewer)">
+      <mat-card id="editor-card" >
+        <mat-card-content #viewer id="viewer" contenteditable="true"  (keydown)="keyDownCliked($event, viewer)" (keyup)="updateContents($event, viewer)">
           <formatted-line *ngFor="let line of workingLineArry; let i = index;"
             [workingLineData]="line"
             index="{{i}}"

@@ -1,7 +1,7 @@
 import { Component, OnInit} from '@angular/core';
 import {trigger,state,style,animate,transition,query,animateChild} from '@angular/animations';
 
-import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} from 'angularfire2/database';
+import {AngularFireDatabase} from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
@@ -52,8 +52,10 @@ export class DirectoryComponent implements OnInit {
         this.router.navigate(['login']);
       }else{
         this.userProfile = storeData;
-
+        console.log("USER UPDATE");
           this.store.select<any>("directory").subscribe(storeDirectory => {
+
+            console.log("AAAA", storeDirectory);
             if(storeData && storeData != "dirty"){
               if(storeDirectory && storeDirectory != "dirty"){
                 //this.directory = storeDirectory;
@@ -62,6 +64,7 @@ export class DirectoryComponent implements OnInit {
                   this.page = {};
                 else{
                   //this.page = JSON.parse(this.directory.paths);
+                  console.log("BBBB", storeDirectory);
                   this.page = storeDirectory;
                   this.items = Object.keys(this.directoryService.navigatePath("", this.page, this.paths));
                   if(this.dialogRef)
@@ -70,7 +73,12 @@ export class DirectoryComponent implements OnInit {
                 this.store.dispatch({type:AppLoaderReducer.STOP_LOADING});
 
               }else if(!storeDirectory){
-                this.store.dispatch({type:DirectoryReducer.GET_DIRECTORY});
+                  // this.router.navigate(['directory'], {});
+                // var db = firebase.firestore();
+                // db.collection('notes').onSnapshot(querySnapshot => {
+                //   this.store.dispatch({type:DirectoryReducer.SET_DIRECTORY, payload:querySnapshot});
+                // });
+                // this.store.dispatch({type:DirectoryReducer.GET_DIRECTORY});
               }
             }
 

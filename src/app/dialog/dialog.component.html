@@ -13,9 +13,9 @@
   <section *ngIf="actionType == 'note'">
 
     <h3>Create New Note</h3>
-    <mat-input-container>
-      <input mdInput placeholder="name" [(ngModel)]="name">
-    </mat-input-container>
+    <mat-form-field>
+      <input matInput placeholder="name" [(ngModel)]="name">
+    </mat-form-field>
     <button mat-button id="logout-button" (click)="createNote(name)">create</button>
     <!--  [mat-dialog-close]="name" -->
 
@@ -24,9 +24,9 @@
   <section *ngIf="actionType == 'folder'">
 
     <h3>Create New Folder</h3>
-    <mat-input-container>
-      <input mdInput placeholder="name" [(ngModel)]="name">
-    </mat-input-container>
+    <mat-form-field>
+      <input matInput placeholder="name" [(ngModel)]="name">
+    </mat-form-field>
     <button mat-button id="logout-button" (click)="createFolder(name)">create</button>
 
   </section>

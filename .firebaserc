@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "myautonote-angular"
+    "default": "myautonote-angular",
+    "myautonote2018": "myautonote2018"
   }
 }

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
-import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
+import {AngularFireDatabase} from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import { Store } from '@ngrx/store';
 import {UserProfileReducer} from './app-store/reducers/user-profile.reducer';
 import {AppLoaderReducer} from './app-store/reducers/app-loader.reducer';
+import {DirectoryReducer} from './app-store/reducers/directory.reducer';
 
 
 
@@ -35,6 +36,10 @@ export class AppComponent {
       if(us){
         this.userProfile = us;
         this.store.dispatch({type:UserProfileReducer.SET_PROFILE, payload:us});
+        var db = firebase.firestore();
+        db.collection('notes').onSnapshot(querySnapshot => {
+          this.store.dispatch({type:DirectoryReducer.SET_DIRECTORY, payload:querySnapshot});
+        });
       }
     });
 

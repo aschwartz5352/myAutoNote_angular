@@ -28,10 +28,12 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import {MatDialogModule, MatMenuModule, MatSnackBarModule, MatCardModule, MatIconModule,MatButtonModule, MatProgressBarModule} from '@angular/material';
+import {MatInputModule} from '@angular/material/input';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
+import { AngularFirestoreModule} from 'angularfire2/firestore';
 
 import { DirectoryComponent } from './directory/directory.component';
 import { DialogComponent } from './dialog/dialog.component';
@@ -59,7 +61,7 @@ export const firebaseConfig = environment.firebaseConfig;
     BrowserModule,
     AppRoutingModule,
     // MaterialModule,
-    MatMenuModule, MatSnackBarModule,MatCardModule,MatIconModule,MatButtonModule,MatProgressBarModule,
+    MatMenuModule, MatSnackBarModule,MatCardModule,MatIconModule,MatButtonModule,MatProgressBarModule,MatInputModule,
     MatDialogModule,
     FormsModule,
     ReactiveFormsModule,
@@ -67,6 +69,7 @@ export const firebaseConfig = environment.firebaseConfig;
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule, // imports firebase/database, only needed for database features
     AngularFireAuthModule,
+    AngularFirestoreModule.enablePersistence(),
     StoreDevtoolsModule.instrumentOnlyWithExtension(),
     StoreModule.provideStore({
        userProfile: UserProfileReducer.reducer,
