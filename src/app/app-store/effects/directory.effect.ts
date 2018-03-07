@@ -41,10 +41,10 @@ export class DirectoryEffects {
 
     this.setDirectory$ = this.actions$
     .ofType(DirectoryReducer.SET_DIRECTORY)
-    .map((action: Action) => this.directoryService.parsePathObservable(action.payload))
+    .map((action: Action) => this.directoryService.getDirectory(action.payload))
     .map(directory => <Action>{type: DirectoryReducer.SET_DIRECTORY_RESPONSE, payload: directory})
     .do(action => {
-      console.log('Rounting');
+      console.log(action);
       // this.router.navigate(['directory'], {});
     })
     .catch((errorOnObservable: Action) => Observable.of({type: 'FETCH_FAILED', payload: errorOnObservable}));

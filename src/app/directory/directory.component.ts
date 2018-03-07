@@ -48,15 +48,15 @@ export class DirectoryComponent implements OnInit {
     public dialog: MatDialog, private directoryService: DirectoryService) { }
 
   ngOnInit() {
-    this.store.select<any>('userProfile').subscribe(storeData => {
-      if (!storeData || storeData === 'dirty') {
+    this.store.select<any>('userProfile').subscribe(storeUser => {
+      if (!storeUser || storeUser === 'dirty') {
         this.router.navigate(['login']);
       } else {
-        this.userProfile = storeData;
+        this.userProfile = storeUser;
         console.log('USER UPDATE');
           this.store.select<any>('directory').subscribe(storeDirectory => {
 
-            if (storeData && storeData !== 'dirty') {
+            if (storeUser && storeUser !== 'dirty') {
               if (storeDirectory && storeDirectory !== 'dirty') {
                 // this.directory = storeDirectory;
 
@@ -73,12 +73,11 @@ export class DirectoryComponent implements OnInit {
                 this.store.dispatch({type: AppLoaderReducer.STOP_LOADING});
 
               }else if (!storeDirectory) {
-                  // this.router.navigate(['directory'], {});
-                // var db = firebase.firestore();
-                // db.collection('notes').onSnapshot(querySnapshot => {
-                //   this.store.dispatch({type:DirectoryReducer.SET_DIRECTORY, payload:querySnapshot});
-                // });
-                // this.store.dispatch({type:DirectoryReducer.GET_DIRECTORY});
+
+                const db = firebase.firestore();
+                db.collection('directory').onSnapshot(querySnapshot => {
+                  this.store.dispatch({type: DirectoryReducer.SET_DIRECTORY, payload: querySnapshot});
+                });
               }
             }
 
@@ -95,6 +94,10 @@ export class DirectoryComponent implements OnInit {
   }
 
   private dive(path) {
+    const db = firebase.firestore();
+    db.collection('directory/').onSnapshot(querySnapshot => {
+      this.store.dispatch({type: DirectoryReducer.SET_DIRECTORY, payload: querySnapshot});
+    });
     if (this.hasChildren(path)) {
       this.items = Object.keys(this.directoryService.navigatePath(path, this.page, this.paths));
       this.paths.push(path);
@@ -120,13 +123,15 @@ export class DirectoryComponent implements OnInit {
 
 
   private hasChildren(p) {
+    
     let result = this.page;
     this.paths.map(t => result = result[t]);
     if (p && p !== '') {
       result = result[p];
     }
-
-    return typeof result !== 'string';
+    // console.log(result);
+    return !result['ref'];
+    // return typeof result !== 'string';
   }
 
   private createNote() {

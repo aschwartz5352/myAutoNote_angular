@@ -17,11 +17,6 @@
             </div><mat-icon *ngIf="i < paths.length-1">keyboard_arrow_right</mat-icon>
           </div>
         </section>
-
-        <!-- <button mat-button id="create-button" [mdMenuTriggerFor]="menu">new</button> -->
-
-        <!--
-        <mat-icon (click)="createFolder()">create_new_folder</mat-icon> -->
       </mat-card-header>
     </mat-card>
   </section>
@@ -49,7 +44,8 @@
           <section class="note-icon-wrapper">
             <mat-icon>description</mat-icon>
           </section>
-          <p class="item-title" *ngIf="directoryService">{{directoryService.navigatePath(item, page, paths)}}</p>
+          <p class="item-title" *ngIf="directoryService">{{item}}</p>
+          <!-- {{directoryService.navigatePath(item, page, paths)}} -->
         </section>
         <!-- <mat-icon  mdTooltip="more">more_vert</mat-icon> -->
       </mat-card-header>

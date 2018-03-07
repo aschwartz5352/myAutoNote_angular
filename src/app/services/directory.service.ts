@@ -28,88 +28,20 @@ export class DirectoryService {
   constructor(private db: AngularFireDatabase, private afs: AngularFirestore, private store: Store<any>) {
     this.store.select<any>('userProfile').subscribe(storeData => {
       if (storeData) {
-
-
-
-
         this.userProfile = storeData;
-        // this.notesCollection = this.afs.collection('notes', ref=>{
-        //   return ref.orderBy('content');
-        //   // return ref.where('hearts', "==", 7);
-        // });
-        // this.notes = this.notesCollection.valueChanges();
-        // console.log(this.notes);
-        // this.notes.subscribe(val=>{
-        //   console.log(val);
-        // });
       }
     });
   }
 
 
 
-  public getDirectory(): Observable<any> {
-
+  public getDirectory(querySnapshot){
     if (this.userProfile.uid) {
-      // const size$ = new Subject<string>();
-      // const queryObservable = size$.switchMap(size =>{
-      //
-      //   console.log("a");
-      //   return this.afs.collection('notes', ref => ref).valueChanges()
-      // }
-      // );
-
-      // subscribe to changes
-      // return queryObservable;
-      // .subscribe((queriedItems:any) => {
-      //   console.log(queriedItems);
-      //   return queriedItems;
-      // });
-      // size$.next();
-      // this.notesDoc = this.afs.doc('notes/asdf');
-      // this.note = this.notesDoc.valueChanges();
-      // this.notesCollection = this.afs.collection('notes', ref=>{
-        // return ref.orderBy('content');
-        // return ref.where('hearts', "==", 7);
-      // });
-      // this.notes = this.notesCollection.valueChanges();
-      // console.log(this.notesCollection);
-
-      // var notes = []; HERE
-      // var db = firebase.firestore();
-      // db.collection('notes');
-      // db.collection('notes').onSnapshot(querySnapshot => {
-      //   var i = 0;
-      //     querySnapshot.forEach((doc) => {
-      //         console.log(i, doc.id, " => ", doc.data());
-      //         notes[i] = doc.data();
-      //         i++;
-      //         console.log(notes);
-      //     });
-      // });
-      // return Observable.of(notes);
-
-      // db.collection('notes').get().then(querySnapshot => {
-      //     querySnapshot.forEach(doc => {
-      //         console.log(doc.id, " => ", doc.data());
-      //     });
-      // });
-
-
-      // var addDoc = db.collection('notes').add({
-      //     title: 'Test 3',
-      //     content: 'more stuff'
-      // }).then(ref => {
-      //     console.log('Added document with ID: ', ref.id);
-      // });
-
-
-      return Observable.of('dirty');
-      // return this.db.object('/users/'+this.userProfile.uid+'/directory').(directory =>{
-      //   if(directory.paths)
-      //     return JSON.parse(directory.paths);
-      //   else return {};
-      // });
+      const notes = {};
+        querySnapshot.forEach((doc) => {
+          notes[doc.data().name] = {id: doc.id, name: doc.data().name, ref: doc.data().ref};
+        });
+        return notes;
     } else {
       return Observable.of('dirty');
     }

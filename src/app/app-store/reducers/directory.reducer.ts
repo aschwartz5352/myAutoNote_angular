@@ -17,24 +17,12 @@ export class DirectoryReducer {
         case 'FETCH_FAILED':
           return action.payload;
         case DirectoryReducer.SET_DIRECTORY:
-
-        console.log('SETDIR');
-          return null;
         case DirectoryReducer.SET_DIRECTORY_RESPONSE:
-        console.log('SETDIRRESPONSE');
           return action.payload;
-        // console.log(action, directory);
-          // return directory;
         case DirectoryReducer.CREATE_FOLDER:
         case DirectoryReducer.CREATE_NOTE:
         return directory;
-        // case DirectoryReducer.RESPONSE_GET_DIRECTORY:
-        // console.log(action);
-          // return Object.assign({path:directory, noteObject:action.payload});
-          // return action.payload;
         case DirectoryReducer.RESTORE_DIRECTORY:
-        // case DirectoryReducer.GET_DIRECTORY:
-          // return Object.assign(action.payload);
         default:
           return directory;
       }
