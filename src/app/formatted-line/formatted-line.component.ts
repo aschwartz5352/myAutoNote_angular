@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
+// tslint:disable-next-line:import-blacklist
 import {Subject, Observable} from 'rxjs';
 import { FormControl } from '@angular/forms';
 
@@ -14,13 +15,13 @@ import { FormControl } from '@angular/forms';
 export class FormattedLineComponent implements OnInit {
 
   @Input()
-  workingLineData:WorkingLine;
+  workingLineData: WorkingLine;
 
   @Input()
-  index : string;
+  index: string;
 
   @Input()
-  selected : string;
+  selected: string;
 
   @Output()
   onClick = new EventEmitter<any>();
@@ -36,8 +37,8 @@ export class FormattedLineComponent implements OnInit {
    }
 
   ngOnInit() {
-    if(this.workingLineData.content.length == 0){
-      console.log("empty");
+    if (this.workingLineData.content.length === 0) {
+      console.log('empty');
     }
     // this.currentLineFormControl.setValue(this.workingLineData.content);
     // this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged().subscribe(val => {
@@ -47,8 +48,8 @@ export class FormattedLineComponent implements OnInit {
 
   }
 
-  private onLineClick(){
-    //Emits back to the working screen to set the workingLineIdx to this line
+  private onLineClick() {
+    // Emits back to the working screen to set the workingLineIdx to this line
     this.onClick.emit(this.index);
   }
 

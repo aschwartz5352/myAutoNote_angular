@@ -15,15 +15,15 @@ export class LoginComponent implements OnInit {
 
   user: Observable<firebase.User>;
 
-  constructor(private afAuth: AngularFireAuth,private db: AngularFireDatabase, private router: Router, private store:Store<any>) {
+  constructor(private afAuth: AngularFireAuth, private db: AngularFireDatabase, private router: Router, private store: Store<any>) {
     this.user = afAuth.authState;
   }
 
 
   ngOnInit() {
-    this.store.select<any>("userProfile").subscribe(storeData => {
+    this.store.select<any>('userProfile').subscribe(storeData => {
       // console.log(storeData);
-      if(storeData && storeData != "dirty"){
+      if (storeData && storeData !== 'dirty') {
         this.router.navigate(['directory']);
       }
     });

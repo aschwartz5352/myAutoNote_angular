@@ -1,5 +1,5 @@
 import { Component, OnInit} from '@angular/core';
-import {trigger,state,style,animate,transition,query,animateChild} from '@angular/animations';
+import {trigger, state, style, animate, transition, query, animateChild} from '@angular/animations';
 
 import {AngularFireDatabase} from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
@@ -36,43 +36,43 @@ import {DirectoryService} from '../services/directory.service';
 })
 export class DirectoryComponent implements OnInit {
 
-  //private directory;
+  // private directory;
   private userProfile;
   private items;
   private page;
   private paths = [];
-  private onPage:boolean = true;
+  private onPage = true;
   private dialogRef;
 
-  constructor(private db: AngularFireDatabase, private store:Store<any>, private router: Router, public dialog: MatDialog, private directoryService:DirectoryService) { }
+  constructor(private db: AngularFireDatabase, private store: Store<any>, private router: Router,
+    public dialog: MatDialog, private directoryService: DirectoryService) { }
 
   ngOnInit() {
-    this.store.select<any>("userProfile").subscribe(storeData => {
-      if(!storeData || storeData == "dirty"){
+    this.store.select<any>('userProfile').subscribe(storeData => {
+      if (!storeData || storeData === 'dirty') {
         this.router.navigate(['login']);
-      }else{
+      } else {
         this.userProfile = storeData;
-        console.log("USER UPDATE");
-          this.store.select<any>("directory").subscribe(storeDirectory => {
+        console.log('USER UPDATE');
+          this.store.select<any>('directory').subscribe(storeDirectory => {
 
-            console.log("AAAA", storeDirectory);
-            if(storeData && storeData != "dirty"){
-              if(storeDirectory && storeDirectory != "dirty"){
-                //this.directory = storeDirectory;
+            if (storeData && storeData !== 'dirty') {
+              if (storeDirectory && storeDirectory !== 'dirty') {
+                // this.directory = storeDirectory;
 
-                if(Object.keys(storeDirectory).length == 1 && Object.keys(storeDirectory)[0]=="$value")
+                if (Object.keys(storeDirectory).length === 1 && Object.keys(storeDirectory)[0] === '$value') {
                   this.page = {};
-                else{
-                  //this.page = JSON.parse(this.directory.paths);
-                  console.log("BBBB", storeDirectory);
+                } else {
+                  // this.page = JSON.parse(this.directory.paths);
                   this.page = storeDirectory;
-                  this.items = Object.keys(this.directoryService.navigatePath("", this.page, this.paths));
-                  if(this.dialogRef)
+                  this.items = Object.keys(this.directoryService.navigatePath('', this.page, this.paths));
+                  if (this.dialogRef) {
                     this.dialogRef.close();
+                  }
                 }
-                this.store.dispatch({type:AppLoaderReducer.STOP_LOADING});
+                this.store.dispatch({type: AppLoaderReducer.STOP_LOADING});
 
-              }else if(!storeDirectory){
+              }else if (!storeDirectory) {
                   // this.router.navigate(['directory'], {});
                 // var db = firebase.firestore();
                 // db.collection('notes').onSnapshot(querySnapshot => {
@@ -89,67 +89,68 @@ export class DirectoryComponent implements OnInit {
     });
   }
 
-  private home(){
-    this.items = Object.keys(this.page)
+  private home() {
+    this.items = Object.keys(this.page);
     this.paths = [];
   }
 
-  private dive(path){
-    if(this.hasChildren(path)){
+  private dive(path) {
+    if (this.hasChildren(path)) {
       this.items = Object.keys(this.directoryService.navigatePath(path, this.page, this.paths));
       this.paths.push(path);
-    }else{
-      //open note
-      this.onPage =false;
-      let nav = "";
-      this.paths.map(p => nav += "/"+p);
-      nav += "/"+this.directoryService.navigatePath(path, this.page, this.paths);
-      this.store.dispatch({type:NoteItemReducer.GET_NOTE, payload:nav});
-      //this.router.navigate(['work'], {queryParams:{nav}});
+    } else {
+      // open note
+      this.onPage = false;
+      let nav = '';
+      this.paths.map(p => nav += '/' + p);
+      nav += '/' + this.directoryService.navigatePath(path, this.page, this.paths);
+      this.store.dispatch({type: NoteItemReducer.GET_NOTE, payload: nav});
+      // this.router.navigate(['work'], {queryParams:{nav}});
 
     }
   }
 
-  private climbTo(path, index){
-    if(index < this.paths.length){
-      this.paths.splice(index+1);
-      this.items = Object.keys(this.directoryService.navigatePath("", this.page, this.paths));
+  private climbTo(path, index) {
+    if (index < this.paths.length) {
+      this.paths.splice(index + 1);
+      this.items = Object.keys(this.directoryService.navigatePath('', this.page, this.paths));
     }
   }
 
 
 
-  private hasChildren(p){
+  private hasChildren(p) {
     let result = this.page;
     this.paths.map(t => result = result[t]);
-    if(p && p != "")
+    if (p && p !== '') {
       result = result[p];
+    }
 
-    return typeof result != 'string';
+    return typeof result !== 'string';
   }
 
-  private createNote(){
-    //let location = this.directoryService.navigatePath("", this.page, this.paths);
+  private createNote() {
+    // let location = this.directoryService.navigatePath("", this.page, this.paths);
 
     this.dialogRef = this.dialog.open(DialogComponent);
-    this.dialogRef.componentInstance.actionType = "note";
+    this.dialogRef.componentInstance.actionType = 'note';
     this.dialogRef.componentInstance.paths = this.paths;
     this.dialogRef.componentInstance.page = this.page;
-    //this.dialogRef.afterClosed().subscribe(result => {
-      //if(result){
-        //location[result] = result;
-        //this.items = Object.keys(this.directoryService.navigatePath("", this.page, this.paths));
-        //this.directory.set({paths:JSON.stringify(this.page)});
-        //this.store.dispatch({type:AppLoaderReducer.STOP_LOADING});
+    // this.dialogRef.afterClosed().subscribe(result => {
+      // if(result){
+        // location[result] = result;
+        // this.items = Object.keys(this.directoryService.navigatePath("", this.page, this.paths));
+        // this.directory.set({paths:JSON.stringify(this.page)});
+        // this.store.dispatch({type:AppLoaderReducer.STOP_LOADING});
     //  }
-    //});
+    // });
   }
 
-  private createFolder(){
-    //let location = this.directoryService.navigatePath("", this.page, this.paths)
+  private createFolder() {
+    // let location = this.directoryService.navigatePath("", this.page, this.paths)
 
     this.dialogRef = this.dialog.open(DialogComponent);
-    this.dialogRef.componentInstance.actionType = "folder";
+    this.dialogRef.componentInstance.actionType = 'folder';
     this.dialogRef.componentInstance.paths = this.paths;
     this.dialogRef.componentInstance.page = this.page;
     // dialogRef.afterClosed().subscribe(result => {

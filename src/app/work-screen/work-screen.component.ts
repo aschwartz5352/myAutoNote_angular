@@ -1,8 +1,9 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, HostListener } from '@angular/core';
-import {trigger,state,style,animate,transition,query,animateChild} from '@angular/animations';
+import { Component, OnInit, Input, ViewChild, ElementRef, HostListener, AfterViewInit } from '@angular/core';
+import {trigger, state, style, animate, transition, query, animateChild} from '@angular/animations';
 // import { QuillEditorComponent } from 'ngx-quill/src/quill-editor.component';
 import { FormControl } from '@angular/forms';
 import 'rxjs/add/operator/debounceTime';
+// tslint:disable-next-line:import-blacklist
 import {Subject, Observable} from 'rxjs';
 import { WorkScreenService } from './work-screen.service';
 import {AngularFireDatabase} from 'angularfire2/database';
@@ -35,7 +36,7 @@ import {MatSnackBar} from '@angular/material';
   trigger('advancedEditorFunction', [
     state('advanced', style({
       opacity: 1,
-      'pointer-events':'auto'
+      'pointer-events': 'auto'
     })),
     transition('* => *', animate('125ms ease-in'))
   ]),
@@ -62,22 +63,23 @@ import {MatSnackBar} from '@angular/material';
 
   ]
 })
-export class WorkScreenComponent implements OnInit {
+export class WorkScreenComponent implements OnInit, AfterViewInit {
 
   public dirty = false;
   private notePath;
-  private noteTitle = "";
+  private noteTitle = '';
+  private insertedNewLine = false;
 
   // @ViewChild('editorbox') editorbox;
   // @ViewChild('editorboxWrapper') editorboxWrapper : ElementRef;
-  @ViewChild('viewer') viewer : ElementRef;
+  @ViewChild('viewer') viewer: ElementRef;
 
   // @ViewChild('editorbox') editorbox;
-  private currentLineFormControl:FormControl = new FormControl("hello world!");
-  private editorBoxCoords = {top:0, right:300};
-  private workingLineIdx:number = 0;
-  private workingLineArry:WorkingLine[] = [
-    {content:"", style:"normal", tabLevels:[0,0,0], tabs:0}
+  private currentLineFormControl: FormControl = new FormControl('hello world!');
+  private editorBoxCoords = {top: 0, right: 300};
+  private workingLineIdx = 0;
+  private workingLineArry: WorkingLine[] = [
+    {content: '', style: 'normal', tabLevels: [0, 0, 0], tabs: 0}
     // {content:"line&nbsp;2", style:"header2", tabLevels:[0,0,0], tabs:1},
     // {content:"line 3", style:"header3", tabLevels:[0,0,0], tabs:2},
     // {content:"line 4", style:"header4", tabLevels:[0,0,0], tabs:3},
@@ -99,18 +101,18 @@ export class WorkScreenComponent implements OnInit {
   private dbNote;
 
 
-  private formattedNotes:string = "";
+  private formattedNotes = '';
 
-  private contentForm:FormControl = new FormControl("");
+  private contentForm: FormControl = new FormControl('');
 
-  private value:string;
+  private value: string;
 
   // public keyUp = new Subject<string>();
 
 
 
-  constructor(private workScreenService:WorkScreenService, private db: AngularFireDatabase, private store:Store<any>, private route:ActivatedRoute,
-    private router: Router,public dialog: MatDialog, public snackBar: MatSnackBar) {
+  constructor(private workScreenService: WorkScreenService, private db: AngularFireDatabase, private store: Store<any>,
+    private route: ActivatedRoute, private router: Router, public dialog: MatDialog, public snackBar: MatSnackBar) {
     // const observable = this.keyUp
     // .map((value) => event)
     // .debounceTime(150)
@@ -125,31 +127,33 @@ export class WorkScreenComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.store.select<any>("userProfile").subscribe(storeUser => {
+    this.store.select<any>('userProfile').subscribe(storeUser => {
       this.userProfile = storeUser;
 
-      this.store.select<any>("noteItem").subscribe(storeData => {
-        if(storeData){
+      this.store.select<any>('noteItem').subscribe(storeData => {
+        if (storeData) {
           this.notePath = storeData.path;
 
           this.dbNote = storeData;
 
-          if(this.dbNote){
+          if (this.dbNote) {
             // this.value = this.dbNote.noteObject;
             // this.updateContents(this.value);
-          }else
-            this.value = "";
+          } else {
+            this.value = '';
             // console.log(this.workingLineArry);
-            // this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged().subscribe(val => {this.updateContents(val)});
+            // this.currentLineFormControl.valueChanges.debounceTime(100).distinctUntilChanged()
+            //     .subscribe(val => {this.updateContents(val)});
             // this.currentLineFormControl.getSelection();
+          }
 
 
-        }else{
-            if(storeUser){
+        } else {
+            if (storeUser) {
 
               this.route.queryParams.subscribe(params => {
-                 if(params){
-                   this.store.dispatch({type:NoteItemReducer.RESTORE_NOTE, payload:params.payload});
+                 if (params) {
+                   this.store.dispatch({type: NoteItemReducer.RESTORE_NOTE, payload: params.payload});
                  }
               });
             }
@@ -161,11 +165,11 @@ export class WorkScreenComponent implements OnInit {
 
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.workingLineArry.map((line, i) => {
-      let temp = this.workScreenService.parseText(line.content, (i == 0) ? [0,0,0] : this.workingLineArry[i-1].tabLevels, 0);
+      const temp = this.workScreenService.parseText(line.content, (i === 0) ? [0, 0, 0] : this.workingLineArry[i - 1].tabLevels, 0);
       // console.log(temp.style,this.workingLineArry[i].content);
-      line.content = temp.content.replace(/ /g, "&nbsp;");
+      line.content = temp.content.replace(/ /g, '&nbsp;');
       line.style = temp.style;
       line.tabs = temp.tabs;
       line.tabLevels = temp.tabLevels;
@@ -184,45 +188,46 @@ export class WorkScreenComponent implements OnInit {
 
 
 
-  private setupViewer(event){
-    console.log(event)
+  private setupViewer(event) {
+    console.log(event);
   }
 
-  private save(){
+  private save() {
     console.log(this.formattedNotes);
 
-    //this.store.dispatch({type:NoteItemReducer.SAVE_NOTE,payload:{path:this.notePath,quickEditMode:(this.viewMode=="quick"),noteObject:this.value}});
+    // this.store.dispatch({type:NoteItemReducer.SAVE_NOTE,payload:
+    //     {path:this.notePath,quickEditMode:(this.viewMode=="quick"),noteObject:this.value}});
 
-    //this.value = "<h1 style='color:#f00' class='textclass' id='testid'>" +this.value + "</h1>";
+    // this.value = "<h1 style='color:#f00' class='textclass' id='testid'>" +this.value + "</h1>";
 
-    this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$0#"+this.value)})
+    this.db.object('/users/' + this.userProfile.uid + '/files').update({[this.notePath]: ('$0#' + this.value)});
 
     this.dirty = false;
-    //this.dbNote.set({text:this.value});
+    // this.dbNote.set({text:this.value});
   }
 
-  private switchToAdvanced(){
-    let dialogRef = this.dialog.open(DialogComponent);
-    dialogRef.componentInstance.actionType = "moveToAdvanced";
+  private switchToAdvanced() {
+    const dialogRef = this.dialog.open(DialogComponent);
+    dialogRef.componentInstance.actionType = 'moveToAdvanced';
     dialogRef.afterClosed().subscribe(result => {
       console.log(result);
-      if(result){
-        this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$1#"+this.formattedNotes)})
-        this.snackBar.open("closed quick editor", "undo", {
+      if (result) {
+        this.db.object('/users/' + this.userProfile.uid + '/files').update({[this.notePath]: ('$1#' + this.formattedNotes)});
+        this.snackBar.open('closed quick editor', 'undo', {
           duration: 5000,
         }).onAction().subscribe(() => {
-          this.db.object('/users/'+this.userProfile.uid+'/files').update({[this.notePath]:("$0#"+this.value)})
+          this.db.object('/users/' + this.userProfile.uid + '/files').update({[this.notePath]: ('$0#' + this.value)});
         });
 
       }
     });
   }
 
-  private lineClicked(index){
+  private lineClicked(index) {
     // console.log(index);
       // let lastIndex = e.selectionStart;
       this.workingLineIdx = index;
-      this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
+      this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop - 20;
       this.currentLineFormControl.setValue(this.workingLineArry[this.workingLineIdx].content);
       // this.editorbox.nativeElement.focus();
       // e.selectionEnd = lastIndex;
@@ -230,11 +235,11 @@ export class WorkScreenComponent implements OnInit {
 
   }
 
-  private setFocusToEnd(e){
+  private setFocusToEnd(e) {
     e.focus();
   }
 
-  private keyCliked(event,e){
+  private keyCliked(event, e) {
     // console.log(event);
     // console.log(e.selectionStart);
     // let lastIndex = e.selectionStart;
@@ -272,13 +277,13 @@ export class WorkScreenComponent implements OnInit {
     // }
   }
 
-  //@HostListener('document:keydown', ['$event'])
-  //handleKeyboardEvent(event: KeyboardEvent) {
-  private keyDownCliked(event, e){
+  // @HostListener('document:keydown', ['$event'])
+  // handleKeyboardEvent(event: KeyboardEvent) {
+  private keyDownCliked(event, e) {
     // let lastIndex = e.selectionStart;
-    if(event){
-      switch(event.key){
-        case "ArrowUp":
+    if (event) {
+      switch (event.key) {
+        case 'ArrowUp':
           // if(this.workingLineIdx > 0){
           //   this.workingLineIdx--;
           //   this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
@@ -292,7 +297,7 @@ export class WorkScreenComponent implements OnInit {
           //   // return false;
           // }
           break;
-        case "ArrowDown":
+        case 'ArrowDown':
           // if(this.workingLineIdx < this.workingLineArry.length-1){
           //   this.workingLineIdx++;
           //   this.editorBoxCoords.top = this.viewer.nativeElement.children[this.workingLineIdx].offsetTop-20;
@@ -304,24 +309,28 @@ export class WorkScreenComponent implements OnInit {
           //
           // }
           break;
-        case "Enter":
-          if(window.getSelection().getRangeAt(0).endContainer.parentElement.id.length > 0)
+        case 'Enter':
+          if (window.getSelection().getRangeAt(0).endContainer.parentElement.id.length > 0) {
             this.workingLineIdx = parseInt(window.getSelection().getRangeAt(0).endContainer.parentElement.id);
-            else console.log("!");
-          console.log(this.workingLineIdx, window.getSelection().getRangeAt(0), window.getSelection().getRangeAt(0).endContainer.parentElement.id);
-          let origionalText = this.viewer.nativeElement.children[this.workingLineIdx].innerText;
-          let splitIndex = window.getSelection().getRangeAt(0).endOffset;
+          } else {
+            console.log('!');
+          }
+          console.log(this.workingLineIdx, window.getSelection().getRangeAt(0),
+                      window.getSelection().getRangeAt(0).endContainer.parentElement.id);
+          const origionalText = this.viewer.nativeElement.children[this.workingLineIdx].innerText;
+          const splitIndex = window.getSelection().getRangeAt(0).endOffset;
           // if(this.workingLineArry[this.workingLineIdx].style == "normal") splitIndex--;
-          let newLine:WorkingLine = {
-              content:origionalText.substring(splitIndex),
-              style: "normal",
+          const newLine: WorkingLine = {
+              content: origionalText.substring(splitIndex),
+              style: 'normal',
               tabs: 0,
               tabLevels: this.workingLineArry[this.workingLineIdx].tabLevels
-            }
+          };
             // console.log(window.getSelection().getRangeAt(0).startOffset);
-            // console.log(this.viewer.nativeElement.children[this.workingLineIdx].innerText.substring(window.getSelection().getRangeAt(0).endOffset));
-            this.workingLineArry[this.workingLineIdx].content = origionalText.substring(0,splitIndex);
-          this.workingLineArry.splice( this.workingLineIdx+1, 0, newLine );
+            // console.log(this.viewer.nativeElement.children[this.workingLineIdx].innerText
+            //     .substring(window.getSelection().getRangeAt(0).endOffset));
+          this.workingLineArry[this.workingLineIdx].content = origionalText.substring(0, splitIndex);
+          this.workingLineArry.splice( this.workingLineIdx + 1, 0, newLine );
           this.workingLineIdx++;
           // let temp = this.workScreenService.parseText("", this.workingLineArry[this.workingLineIdx-1].tabLevels, 0);
           // this.workingLineArry[this.workingLineIdx].style = temp.style;
@@ -333,7 +342,7 @@ export class WorkScreenComponent implements OnInit {
           // var timer = setInterval();
 
           return false;
-        case "ArrowRight":
+        case 'ArrowRight':
 
           break;
       }
@@ -341,19 +350,17 @@ export class WorkScreenComponent implements OnInit {
     }
   }
 
-  private insertedNewLine:boolean = false;
-
   ngAfterViewChecked(){
-    if(this.insertedNewLine){
+    if (this.insertedNewLine){
       this.insertedNewLine = false;
-      var node = this.viewer.nativeElement;
+      const node = this.viewer.nativeElement;
       node.focus();
-      var textNode = node.children[this.workingLineIdx].firstChild;
-      var caret = 0;
-      var range = document.createRange();
+      const textNode = node.children[this.workingLineIdx].firstChild;
+      const caret = 0;
+      const range = document.createRange();
       range.setStart(textNode, caret);
       range.setEnd(textNode, caret);
-      var sel = window.getSelection();
+      const sel = window.getSelection();
       sel.removeAllRanges();
       // sel.getRangeAt(0).setStart(node.children[this.workingLineIdx-1].firstChild,node.children[this.workingLineIdx-1].innerText.length+1);
       sel.addRange(range);
@@ -363,13 +370,13 @@ export class WorkScreenComponent implements OnInit {
   private padding = [];
 
   private updateContents(event, e){
-    if(event.key == "Enter"){
+    if (event.key === 'Enter'){
 
       // console.log(this.workingLineArry);
       return false;
 
     }
-    if(event.key == "Shift" || event.key == "Control" || event.key == "ArrowRight" || event.key == "ArrowLeft" || event.key == "ArrowUp" || event.key == "ArrowDown"){
+    if (event.key === 'Shift' || event.key === 'Control' || event.key === 'ArrowRight' || event.key === 'ArrowLeft' || event.key === 'ArrowUp' || event.key === 'ArrowDown'){
       return;
     }
     console.log(event);
@@ -379,9 +386,9 @@ export class WorkScreenComponent implements OnInit {
     // console.log(document.getSelection());
 
     // console.log(newContent,this.workingLineIdx, temp);
-    for(let i = this.workingLineIdx; i < this.workingLineArry.length; i++){
+    for (let i = this.workingLineIdx; i < this.workingLineArry.length; i++){
 
-      let temp = this.workScreenService.parseText(e.children[i].innerText, (i == 0) ? [0,0,0] : this.workingLineArry[i-1].tabLevels, 0);
+      const temp = this.workScreenService.parseText(e.children[i].innerText, (i === 0) ? [0, 0, 0] : this.workingLineArry[i - 1].tabLevels, 0);
       // console.log(temp.style,this.workingLineArry[i].content);
       // this.workingLineArry[i].content = temp.content;
       this.workingLineArry[i].style = temp.style;
@@ -398,22 +405,22 @@ export class WorkScreenComponent implements OnInit {
 
   }
 
-  private updateContent(event:any, input:string){
-    let temp = "";
-    let formattedLines = this.formattedNotes.split("\n");
-    let lines = 0;
+  private updateContent(event: any, input: string){
+    const temp = '';
+    const formattedLines = this.formattedNotes.split('\n');
+    const lines = 0;
     let newLine;
     this.dirty = true;
-    //console.log(Array.from(event.editor.container.children[0].children));
-    let unprocessed =[];
-    if(event)
+    // console.log(Array.from(event.editor.container.children[0].children));
+    let unprocessed = [];
+    if (event)
       unprocessed = Array.from(event.editor.container.children[0].children);
-    else if(input)
-      unprocessed = Array.from(input.split("\n"));
+    else if (input)
+      unprocessed = Array.from(input.split('\n'));
 
 
     this.workScreenService.paddingLevel = [];
-    unprocessed.map((lineElement:HTMLElement,i:number) => {
+    unprocessed.map((lineElement: HTMLElement, i: number) => {
        // console.log(lineElement);
          // temp += this.workScreenService.parseText(lineElement, (i<unprocessed.length-1)?unprocessed[i+1]:"", 0)+"\n";
 
@@ -439,33 +446,33 @@ export class WorkScreenComponent implements OnInit {
   }
 
   private selection;
-  private currentValue:string = "";
+  private currentValue = '';
   private something(event){
 
     if (window.getSelection) {
-      let a = window.getSelection().focusOffset;
-      let b = window.getSelection().anchorOffset;
-      if(a < b)
-        this.selection = {start:a,end:b};
+      const a = window.getSelection().focusOffset;
+      const b = window.getSelection().anchorOffset;
+      if (a < b)
+        this.selection = {start: a, end: b};
       else
-        this.selection = {start:b,end:a};
-        //console.log(this.selection,  window.getSelection().getRangeAt(0));
+        this.selection = {start: b, end: a};
+        // console.log(this.selection,  window.getSelection().getRangeAt(0));
     }
   }
 
-  private format(command:string, event){
+  private format(command: string, event){
     // switch(type){
     //   case "b":
     //   case "em":
     //   case "u":
     // }
     event.preventDefault();
-    if (command == 'h1' || command == 'h2' || command == 'p') {
+    if (command === 'h1' || command === 'h2' || command === 'p') {
     document.execCommand('formatBlock', false, command);
   }
 
-  if (command == 'forecolor' || command == 'backcolor') {
-    document.execCommand(command, false, "#f00");
+  if (command === 'forecolor' || command === 'backcolor') {
+    document.execCommand(command, false, '#f00');
   }
 
   // if (command == 'createlink' || command == 'insertimage') {
@@ -474,8 +481,8 @@ export class WorkScreenComponent implements OnInit {
   // }
 
   else {
-    console.log(command, document.execCommand(command, false, {id:"hello"}));
-    //console.log(window.getSelection().focusNode.extendOffset)// = "oder2";
+    console.log(command, document.execCommand(command, false, {id: 'hello'}));
+    // console.log(window.getSelection().focusNode.extendOffset)// = "oder2";
   }
     // if(this.selection){
     //   console.log(this.selection, this.editorBox.nativeElement.innerHTML);
@@ -485,12 +492,12 @@ export class WorkScreenComponent implements OnInit {
   }
 
   showSelectedText(oField) {
-    var text = "";
+    let text = '';
     if (window.getSelection) {
         text = window.getSelection().toString();
     }
     console.log(text);
-    //this.selectedText = text;
+    // this.selectedText = text;
   }
 
 

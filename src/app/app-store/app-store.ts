@@ -1,5 +1,5 @@
-export interface MyAutoNote{
-  userProfile:any;
-  noteItem:any;
-  appLoading:number;
+export interface MyAutoNote {
+  userProfile: any;
+  noteItem: any;
+  appLoading: number;
 }

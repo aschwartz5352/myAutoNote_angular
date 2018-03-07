@@ -8,24 +8,24 @@ import { AngularFireAuth } from 'angularfire2/auth';
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.sass'],
-  animations:[]
+  animations: []
 
 })
 export class HeaderComponent implements OnInit {
 
-  private userProfile:any={};
+  private userProfile: any= {};
 
-  constructor(private store:Store<any>,public dialog: MatDialog) { }
+  constructor(private store: Store<any>, public dialog: MatDialog) { }
 
   ngOnInit() {
-    this.store.select<any>("userProfile").subscribe(storeData => {
+    this.store.select<any>('userProfile').subscribe(storeData => {
       this.userProfile = storeData;
     });
   }
 
   private openDialog() {
-    let dialogRef = this.dialog.open(DialogComponent);
-    dialogRef.componentInstance.actionType = "logout";
+    const dialogRef = this.dialog.open(DialogComponent);
+    dialogRef.componentInstance.actionType = 'logout';
     dialogRef.afterClosed().subscribe(result => {
 
     });

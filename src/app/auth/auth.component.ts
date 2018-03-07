@@ -23,9 +23,9 @@ export class AuthComponent implements OnInit {
   user: Observable<firebase.User>;
   // items: FirebaseListObservable<any[]>;
   private item;
-  forms:any[] = [];
+  forms: any[] = [];
 
-  constructor(private afAuth: AngularFireAuth,private db: AngularFireDatabase, private store:Store<any>) {
+  constructor(private afAuth: AngularFireAuth, private db: AngularFireDatabase, private store: Store<any>) {
     this.user = afAuth.authState;
   }
 
@@ -39,9 +39,9 @@ export class AuthComponent implements OnInit {
 
   ngOnInit() {
 
-    //this.user.subscribe(us => {
+    // this.user.subscribe(us => {
 
-      //this.store.dispatch({type:UserProfileReducer.SET_PROFILE, payload:us});
+      // this.store.dispatch({type:UserProfileReducer.SET_PROFILE, payload:us});
       // let d = new Date();
       //
       //  this.item = this.db.object('/users/'+us.uid);
@@ -49,8 +49,8 @@ export class AuthComponent implements OnInit {
       //    lastLoginDate:d.getTime(),
       //  });
 
-      //this.item.subscribe(item => console.log(item));
-      //this.items = this.db.list('/items');
+      // this.item.subscribe(item => console.log(item));
+      // this.items = this.db.list('/items');
     //   this.items.subscribe(items =>{
     //     this.forms = [];
     //     items.map(item => {
@@ -62,7 +62,7 @@ export class AuthComponent implements OnInit {
     //       console.log(newData);
     //     }));
     // });
-  //});
+  // });
 
 
 }

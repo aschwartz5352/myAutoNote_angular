@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Store, Action} from '@ngrx/store';
+// tslint:disable-next-line:import-blacklist
 import {Observable} from 'rxjs';
 import { Effect, Actions } from '@ngrx/effects';
 import { Router} from '@angular/router';
@@ -11,7 +12,7 @@ import { AppLoaderReducer } from '../../app-store/reducers/app-loader.reducer';
 
 
 @Injectable()
-export class DirectoryEffects{
+export class DirectoryEffects {
 
   // @Effect()
   // private getDirectory$:Observable<Action>;
@@ -25,7 +26,7 @@ export class DirectoryEffects{
   @Effect()
   private setDirectory$;
 
-  constructor(private store:Store<number>,private actions$: Actions, private directoryService:DirectoryService, private router: Router){
+  constructor(private store: Store<number>, private actions$: Actions, private directoryService: DirectoryService, private router: Router) {
 
     // this.getDirectory$ = this.actions$
     // .ofType(DirectoryReducer.GET_DIRECTORY)
@@ -40,29 +41,29 @@ export class DirectoryEffects{
 
     this.setDirectory$ = this.actions$
     .ofType(DirectoryReducer.SET_DIRECTORY)
-    .map((action:Action) => this.directoryService.parsePathObservable(action.payload))
-    .map(directory => {return <Action>{type:DirectoryReducer.SET_DIRECTORY_RESPONSE,payload:directory}})
+    .map((action: Action) => this.directoryService.parsePathObservable(action.payload))
+    .map(directory => <Action>{type: DirectoryReducer.SET_DIRECTORY_RESPONSE, payload: directory})
     .do(action => {
-      console.log("Rounting");
+      console.log('Rounting');
       // this.router.navigate(['directory'], {});
     })
-    .catch((errorOnObservable:Action) => Observable.of({type:"FETCH_FAILED",payload:errorOnObservable}));
+    .catch((errorOnObservable: Action) => Observable.of({type: 'FETCH_FAILED', payload: errorOnObservable}));
 
     this.createFolder$ = this.actions$
     .ofType(DirectoryReducer.CREATE_FOLDER)
-    .map((action:Action) => this.directoryService.createFolder(action.payload.name,action.payload.page,action.payload.paths))
-    .map(noteObject => {return <Action>{type:DirectoryReducer.GET_DIRECTORY}})
+    .map((action: Action) => this.directoryService.createFolder(action.payload.name, action.payload.page, action.payload.paths))
+    .map(noteObject => <Action>{type: DirectoryReducer.GET_DIRECTORY})
     .do(action => {
     })
-    .catch((errorOnObservable:Action) => Observable.of({type:"FETCH_FAILED",payload:errorOnObservable}));
+    .catch((errorOnObservable: Action) => Observable.of({type: 'FETCH_FAILED', payload: errorOnObservable}));
 
     this.createNote$ = this.actions$
     .ofType(DirectoryReducer.CREATE_NOTE)
-    .map((action:Action) => this.directoryService.createNote(action.payload.name,action.payload.page,action.payload.paths))
-    .map(noteObject => {return <Action>{type:DirectoryReducer.GET_DIRECTORY}})
+    .map((action: Action) => this.directoryService.createNote(action.payload.name, action.payload.page, action.payload.paths))
+    .map(noteObject => <Action>{type: DirectoryReducer.GET_DIRECTORY})
     .do(action => {
     })
-    .catch((errorOnObservable:Action) => Observable.of({type:"FETCH_FAILED",payload:errorOnObservable}));
+    .catch((errorOnObservable: Action) => Observable.of({type: 'FETCH_FAILED', payload: errorOnObservable}));
 
 
 
