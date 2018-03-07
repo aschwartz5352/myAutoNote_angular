@@ -5,15 +5,15 @@
     <mat-card>
       <mat-card-header id="header-wrapper">
         <section id="path-wrapper" >
-          <div class="path">
+          <!-- <div class="path">
             <div (click)="home()">Home</div>
             <mat-icon>keyboard_arrow_right</mat-icon>
-          </div>
+          </div> -->
 
 
           <div class="path" *ngFor="let p of paths; let i = index;">
             <div (click)="climbTo(p,i)">
-              {{p}}
+              {{p['name']}}
             </div><mat-icon *ngIf="i < paths.length-1">keyboard_arrow_right</mat-icon>
           </div>
         </section>

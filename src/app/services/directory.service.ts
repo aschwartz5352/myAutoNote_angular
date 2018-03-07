@@ -35,7 +35,7 @@ export class DirectoryService {
 
 
 
-  public getDirectory(querySnapshot){
+  public getDirectory(querySnapshot) {
     if (this.userProfile.uid) {
       const notes = {};
         querySnapshot.forEach((doc) => {
@@ -64,17 +64,17 @@ export class DirectoryService {
     // return "asdf";
   }
 
-  public navigatePath(p, page, paths) {
+  /* public navigatePath(p, page, paths) {
     let result = Object.assign(page);
     paths.map(t => result = result[t]);
     if (p && p !== '') {
       result = result[p];
     }
     return result;
-  }
+  } */
 
   public createFolder(result: string, page, paths) {
-    const location = this.navigatePath('', page, paths);
+    const location = paths.map(v => v['id']).join('/');
     if (result) {
       location[result] = {};
       // this.items = Object.keys(this.navigatePath("", page, paths));
@@ -83,7 +83,7 @@ export class DirectoryService {
   }
 
   public createNote(result: string, page, paths) {
-    const location = this.navigatePath('', page, paths);
+    const location = paths.map(v => v['id']).join('/');
     if (result) {
       location[result] = result;
       this.db.object('/users/' + this.userProfile.uid + '/directory').set({paths: JSON.stringify(page)});

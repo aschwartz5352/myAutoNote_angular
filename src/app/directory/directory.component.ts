@@ -43,6 +43,7 @@ export class DirectoryComponent implements OnInit {
   private paths = [];
   private onPage = true;
   private dialogRef;
+  private root = 'directory';
 
   constructor(private db: AngularFireDatabase, private store: Store<any>, private router: Router,
     public dialog: MatDialog, private directoryService: DirectoryService) { }
@@ -58,6 +59,7 @@ export class DirectoryComponent implements OnInit {
 
             if (storeUser && storeUser !== 'dirty') {
               if (storeDirectory && storeDirectory !== 'dirty') {
+                console.log(storeDirectory);
                 // this.directory = storeDirectory;
 
                 if (Object.keys(storeDirectory).length === 1 && Object.keys(storeDirectory)[0] === '$value') {
@@ -65,19 +67,21 @@ export class DirectoryComponent implements OnInit {
                 } else {
                   // this.page = JSON.parse(this.directory.paths);
                   this.page = storeDirectory;
-                  this.items = Object.keys(this.directoryService.navigatePath('', this.page, this.paths));
+                  // this.items = Object.keys(this.directoryService.navigatePath('', this.page, this.paths));
+                  this.items = Object.keys(storeDirectory);
                   if (this.dialogRef) {
                     this.dialogRef.close();
                   }
                 }
                 this.store.dispatch({type: AppLoaderReducer.STOP_LOADING});
 
-              }else if (!storeDirectory) {
+              } else if (!storeDirectory) {
 
                 const db = firebase.firestore();
-                db.collection('directory').onSnapshot(querySnapshot => {
+                db.collection(this.root).onSnapshot(querySnapshot => {
                   this.store.dispatch({type: DirectoryReducer.SET_DIRECTORY, payload: querySnapshot});
                 });
+                this.paths.push({id: this.root, name: 'Home'});
               }
             }
 
@@ -93,45 +97,58 @@ export class DirectoryComponent implements OnInit {
     this.paths = [];
   }
 
-  private dive(path) {
+  private dive(item) {
     const db = firebase.firestore();
-    db.collection('directory/').onSnapshot(querySnapshot => {
-      this.store.dispatch({type: DirectoryReducer.SET_DIRECTORY, payload: querySnapshot});
-    });
-    if (this.hasChildren(path)) {
-      this.items = Object.keys(this.directoryService.navigatePath(path, this.page, this.paths));
-      this.paths.push(path);
+    item = this.page[item];
+    const curPath = this.paths.map(v => v['id']).join('/') + '/' + item['id'];
+    if (item['ref']) {
+      // Open note.
+      this.store.dispatch({type: NoteItemReducer.GET_NOTE, payload: curPath});
     } else {
-      // open note
-      this.onPage = false;
-      let nav = '';
-      this.paths.map(p => nav += '/' + p);
-      nav += '/' + this.directoryService.navigatePath(path, this.page, this.paths);
-      this.store.dispatch({type: NoteItemReducer.GET_NOTE, payload: nav});
-      // this.router.navigate(['work'], {queryParams:{nav}});
-
+      db.collection(curPath + '/' + 'directory').onSnapshot(querySnapshot => {
+        this.store.dispatch({type: DirectoryReducer.SET_DIRECTORY, payload: querySnapshot});
+      });
+      this.paths.push({id: item.id + '/' + 'directory', name: item.name});
     }
+    // if (this.hasChildren(item)) {
+    //   this.items = Object.keys(this.directoryService.navigatePath(item, this.page, this.paths));
+    //   this.paths.push(item);
+    // } else {
+    //   // open note
+    //   this.onPage = false;
+    //   let nav = '';
+    //   this.paths.map(p => nav += '/' + p);
+    //   nav += '/' + this.directoryService.navigatePath(item, this.page, this.paths);
+    //   this.store.dispatch({type: NoteItemReducer.GET_NOTE, payload: nav});
+    //   // this.router.navigate(['work'], {queryParams:{nav}});
+
+    // }
   }
 
   private climbTo(path, index) {
     if (index < this.paths.length) {
       this.paths.splice(index + 1);
-      this.items = Object.keys(this.directoryService.navigatePath('', this.page, this.paths));
+      const db = firebase.firestore();
+      const curPath = this.paths.map(v => v['id']).join('/');
+      db.collection(curPath).onSnapshot(querySnapshot => {
+        this.store.dispatch({type: DirectoryReducer.SET_DIRECTORY, payload: querySnapshot});
+      });
     }
   }
 
 
 
   private hasChildren(p) {
-    
-    let result = this.page;
-    this.paths.map(t => result = result[t]);
-    if (p && p !== '') {
-      result = result[p];
-    }
+
+    // let result = this.page;
+    // this.paths.map(t => result = result[t]);
+    // if (p && p !== '') {
+    //   result = result[p];
+    // }
     // console.log(result);
-    return !result['ref'];
+    // return !result['ref'];
     // return typeof result !== 'string';
+    return !this.page[p]['ref'];
   }
 
   private createNote() {
