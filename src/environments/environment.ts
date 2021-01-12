@@ -6,19 +6,19 @@
 export const environment = {
   production: false,
   // firebaseConfig: {
-  //   apiKey: "AIzaSyCD8cMK1pnV_TIVezCcgMP6qMOMQW_2ZCQ",
-  //   authDomain: "myautonote-angular.firebaseapp.com",
+  //   apiKey: "",
+  //   authDomain: "",
   //   databaseURL: "https://myautonote-angular.firebaseio.com",
   //   projectId: "myautonote-angular",
   //   storageBucket: "",
-  //   messagingSenderId: "747386797067"
+  //   messagingSenderId: ""
   // }
   firebaseConfig: {
-    apiKey: "AIzaSyDDTxDJU7L93PN-mLMxyc92S_P1zWa40KA",
-    authDomain: "myautonote2018.firebaseapp.com",
-    databaseURL: "https://myautonote2018.firebaseio.com",
-    projectId: "myautonote2018",
-    storageBucket: "myautonote2018.appspot.com",
-    messagingSenderId: "26895761467"
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: ""
   }
 };
